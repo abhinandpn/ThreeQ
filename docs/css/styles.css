@@ -966,7 +966,7 @@ tr:hover td {
   margin-bottom: 0.35rem;
 }
 
-.form-input, .form-select, .form-textarea {
+.form-input, .form-textarea {
   width: 100%;
   padding: 10px 12px;
   border-radius: var(--radius-md);
@@ -978,18 +978,182 @@ tr:hover td {
   transition: all 0.25s var(--ease-bounce);
 }
 
+.form-select {
+  width: 100%;
+  padding: 10px 36px 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  transition: all 0.25s var(--ease-bounce);
+}
+
+.form-select option {
+  background-color: #0f172a;
+  color: #f8fafc;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+}
+
+.form-select option:hover,
+.form-select option:focus,
+.form-select option:checked {
+  background-color: #1e293b;
+  color: var(--emerald-light);
+}
+
 @media (min-width: 640px) {
-  .form-input, .form-select, .form-textarea {
+  .form-input, .form-textarea {
     padding: 12px 16px;
     font-size: 0.9rem;
+  }
+  .form-select {
+    padding: 11px 40px 11px 16px;
+    font-size: 0.9rem;
+    background-position: right 14px center;
   }
 }
 
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--emerald-main);
+  background-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 25px -3px var(--emerald-glow);
+  transform: translateY(-1px);
+}
+
+/* Custom Floating Glass Dropdown UI Component */
+.custom-select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-bounce);
+  user-select: none;
+  text-align: left;
+}
+
+@media (min-width: 640px) {
+  .custom-select-trigger {
+    padding: 11px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+.custom-select-trigger:hover,
+.custom-select-wrapper.open .custom-select-trigger {
+  border-color: var(--emerald-main);
   background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 0 25px -3px var(--emerald-glow);
   transform: translateY(-1px);
+}
+
+.custom-select-trigger .trigger-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s var(--ease-bounce);
+  color: var(--emerald-light);
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.custom-select-wrapper.open .custom-select-trigger .trigger-icon {
+  transform: rotate(180deg);
+}
+
+.custom-select-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  min-width: 190px;
+  background: rgba(13, 21, 39, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(16, 185, 129, 0.15);
+  z-index: 1000;
+  padding: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.98);
+  transition: all 0.2s var(--ease-bounce);
+  pointer-events: none;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.custom-select-wrapper.open .custom-select-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.custom-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.custom-select-option:hover {
+  background: rgba(16, 185, 129, 0.15);
+  color: #fff;
+}
+
+.custom-select-option.selected {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--emerald-light);
+  font-weight: 700;
+}
+
+.custom-select-option .check-mark {
+  font-size: 0.85rem;
+  color: var(--emerald-light);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.15s ease;
+}
+
+.custom-select-option.selected .check-mark {
+  opacity: 1;
+  transform: scale(1);
 }
 
 /* Canvas Confetti Layer */

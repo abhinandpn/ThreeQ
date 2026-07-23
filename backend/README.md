@@ -1,11 +1,11 @@
-# Quiz Keralam - Go Backend API
+# ThreeQ - Go Backend API
 
-High-performance RESTful API powering Quiz Keralam ("3 Questions. 1 Minute. Every Day."), built using Go, Gin framework, pgxpool, and Google Gemini API.
+High-performance RESTful API powering ThreeQ ("3 Questions. 1 Minute. Every Day."), built using Go, Gin framework, pgxpool, and Google Gemini API.
 
 ## Features
 - **Public Quiz Engine**: Serves daily quiz questions without revealing correct answers before submission.
 - **Server-Side Scoring**: Validates answer submissions and calculates official score (0-3).
-- **Gemini AI Generator**: Daily automated draft quiz creation with Kerala, India, and rotating categories.
+- **Gemini AI Generator**: Daily automated draft quiz creation with National, World/International, and General Knowledge categories.
 - **Admin System**: JWT authenticated dashboard to review, edit, approve, and publish quizzes.
 - **PostgreSQL Database**: Connection pooled via `pgxpool` with strict foreign key constraints and audit logging.
 

@@ -93,17 +93,17 @@ func (s *service) GenerateDailyQuiz(ctx context.Context, customDate string) (*qu
 
 	log.Printf("[AI-GENERATION] Initiating Gemini Quiz Generation for date: %s", targetDate)
 
-	prompt := fmt.Sprintf(`Generate a 3-question competitive exam daily current affairs quiz for date %s.
+	prompt := fmt.Sprintf(`Generate a 3-question competitive exam daily current affairs & General Knowledge (GK) quiz for date %s.
 Question Distribution:
-- Question 1 (display_order 1): Category must be "Kerala Current Affairs". Focus on recent news, achievements, governance, or cultural updates from Kerala.
-- Question 2 (display_order 2): Category must be "India Current Affairs". Focus on national governance, policy, economy, or achievements in India.
-- Question 3 (display_order 3): Category must be one rotating topic such as "Science & Tech", "Sports", "Environment", "Economy", or "International Affairs".
+- Question 1 (display_order 1): Category must be "National Current Affairs". Focus on national governance, Union policy, infrastructure, Supreme Court rulings, or major national achievements.
+- Question 2 (display_order 2): Category must be "International & World News". Focus on global summits, international organizations, foreign policy, or major world affairs.
+- Question 3 (display_order 3): Category must be one topic such as "General Knowledge (GK)", "Science & Tech", "Sports & Awards", "Economy", or "History & Polity".
 
 Requirements:
 - Provide exactly 4 options (A, B, C, D) for each question.
 - Ensure exactly ONE option is correct.
 - Provide a clear factual explanation under 80 words.
-- Provide reputable news sources (e.g. The Hindu, PIB, Press Trust of India, Malayala Manorama, Mathrubhumi) with source_name, valid source_url, and source_date (%s).
+- Provide reputable news sources (e.g. The Hindu, PIB, Press Trust of India, Reuters, BBC) with source_name, valid source_url, and source_date (%s).
 - Title must be "Daily Current Affairs Quiz - %s".
 
 Return JSON in this EXACT structure:
@@ -113,7 +113,7 @@ Return JSON in this EXACT structure:
   "questions": [
     {
       "display_order": 1,
-      "category": "Kerala Current Affairs",
+      "category": "National Current Affairs",
       "question_text": "...",
       "options": { "A": "...", "B": "...", "C": "...", "D": "..." },
       "correct_option": "A",
@@ -252,15 +252,9 @@ func (s *service) callGeminiAPI(ctx context.Context, prompt string) (string, err
 
 func (s *service) cleanJSONString(input string) string {
 	cleaned := strings.TrimSpace(input)
-	if strings.HasPrefix(cleaned, "```json") {
-		cleaned = strings.TrimPrefix(cleaned, "```json")
-	}
-	if strings.HasPrefix(cleaned, "```") {
-		cleaned = strings.TrimPrefix(cleaned, "```")
-	}
-	if strings.HasSuffix(cleaned, "```") {
-		cleaned = strings.TrimSuffix(cleaned, "```")
-	}
+	cleaned = strings.TrimPrefix(cleaned, "```json")
+	cleaned = strings.TrimPrefix(cleaned, "```")
+	cleaned = strings.TrimSuffix(cleaned, "```")
 	return strings.TrimSpace(cleaned)
 }
 
@@ -287,34 +281,34 @@ func (s *service) generateMockFallbackJSON() string {
   "questions": [
     {
       "display_order": 1,
-      "category": "Kerala Current Affairs",
-      "question_text": "Which Kerala port recently registered a record container handling benchmark following its inaugural commercial Phase-1 operations?",
+      "category": "National Current Affairs",
+      "question_text": "Which initiative was approved by the Union Cabinet of India with a budget of ₹2,000 crore to enhance weather observation, radar networks, and AI forecasting?",
       "options": {
-        "A": "Cochin Port",
-        "B": "Vizhinjam International Transshipment Deepwater Multipurpose Seaport",
-        "C": "Beypore Port",
-        "D": "Kollam Port"
+        "A": "Mission Mausam",
+        "B": "Project WeatherNet",
+        "C": "Digital Sky Mission",
+        "D": "PM Climate Raksha"
       },
-      "correct_option": "B",
-      "explanation": "Vizhinjam International Transshipment Seaport near Thiruvananthapuram is India's first deepwater transshipment port.",
-      "source_name": "The Hindu",
-      "source_url": "https://www.thehindu.com",
+      "correct_option": "A",
+      "explanation": "Mission Mausam was launched by the Ministry of Earth Sciences to significantly boost weather surveillance radars, supercomputers, and high-resolution atmospheric modelling.",
+      "source_name": "Press Information Bureau (PIB)",
+      "source_url": "https://pib.gov.in",
       "source_date": "%s"
     },
     {
       "display_order": 2,
-      "category": "India Current Affairs",
-      "question_text": "Which Indian city hosted the Global Renewable Energy Investment Meet (RE-INVEST)?",
+      "category": "International & World News",
+      "question_text": "Which landmark international agreement was formally adopted at the UN Summit of the Future during the 79th General Assembly?",
       "options": {
-        "A": "Gandhinagar",
-        "B": "New Delhi",
-        "C": "Bengaluru",
-        "D": "Mumbai"
+        "A": "Pact for the Future",
+        "B": "Global Climate Charter",
+        "C": "Geneva Security Accord",
+        "D": "Paris Digital Declaration"
       },
       "correct_option": "A",
-      "explanation": "The 4th Global Renewable Energy Investment Meet & Expo (RE-INVEST) was inaugurated in Mahatma Mandir, Gandhinagar, Gujarat.",
-      "source_name": "Press Information Bureau (PIB)",
-      "source_url": "https://pib.gov.in",
+      "explanation": "World leaders at the United Nations adopted the Pact for the Future, including a Global Digital Compact and a Declaration on Future Generations.",
+      "source_name": "UN News",
+      "source_url": "https://news.un.org",
       "source_date": "%s"
     },
     {

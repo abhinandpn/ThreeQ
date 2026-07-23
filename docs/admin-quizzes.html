@@ -93,6 +93,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       App.renderHeader('');
       App.renderFooter();
+      App.initCustomSelects();
 
       if (!Storage.getAdminToken()) {
         window.location.href = 'admin-login.html';

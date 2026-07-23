@@ -157,7 +157,7 @@ const App = {
               <span style="font-weight: 900; font-size: 1.2rem; color: #fff;">ThreeQ</span>
             </div>
             <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 12px; color: var(--text-secondary);">
-              3 Questions. 1 Minute. Every Day. Futuristic daily current affairs learning micro-platform focused on Kerala and India.
+              3 Questions. 1 Minute. Every Day. Futuristic daily current affairs & General Knowledge micro-learning platform covering National, International, and General Knowledge topics.
             </p>
             <p style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">
               © ${new Date().getFullYear()} ThreeQ. Built with HTML5, CSS3 & Go.
@@ -186,5 +186,104 @@ const App = {
         </div>
       </footer>
     `;
+  },
+
+  initCustomSelects(targetSelect = null) {
+    const selects = targetSelect 
+      ? (targetSelect instanceof NodeList || Array.isArray(targetSelect) ? Array.from(targetSelect) : [targetSelect])
+      : Array.from(document.querySelectorAll('select.form-select'));
+
+    selects.forEach(select => {
+      if (!select || select.dataset.customSelectInitialized) return;
+      select.dataset.customSelectInitialized = 'true';
+
+      // Hide native select element
+      select.style.display = 'none';
+
+      // Create custom wrapper
+      const wrapper = document.createElement('div');
+      wrapper.className = 'custom-select-wrapper';
+      if (select.style.maxWidth) wrapper.style.maxWidth = select.style.maxWidth;
+      if (select.style.width) wrapper.style.width = select.style.width;
+
+      const trigger = document.createElement('button');
+      trigger.type = 'button';
+      trigger.className = 'custom-select-trigger';
+
+      const getSelectedOpt = () => select.options[select.selectedIndex] || select.options[0];
+      const triggerText = document.createElement('span');
+      triggerText.textContent = getSelectedOpt() ? getSelectedOpt().textContent : 'Select...';
+
+      const triggerIcon = document.createElement('div');
+      triggerIcon.className = 'trigger-icon';
+      triggerIcon.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+
+      trigger.appendChild(triggerText);
+      trigger.appendChild(triggerIcon);
+
+      const dropdown = document.createElement('div');
+      dropdown.className = 'custom-select-dropdown';
+
+      const populateOptions = () => {
+        dropdown.innerHTML = '';
+        Array.from(select.options).forEach((opt, idx) => {
+          const optionEl = document.createElement('div');
+          optionEl.className = `custom-select-option ${idx === select.selectedIndex ? 'selected' : ''}`;
+          optionEl.dataset.value = opt.value;
+          optionEl.innerHTML = `<span>${opt.textContent}</span><span class="check-mark">✓</span>`;
+
+          optionEl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (select.selectedIndex !== idx) {
+              select.selectedIndex = idx;
+              select.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            triggerText.textContent = opt.textContent;
+
+            dropdown.querySelectorAll('.custom-select-option').forEach((o, i) => {
+              o.classList.toggle('selected', i === idx);
+            });
+
+            wrapper.classList.remove('open');
+          });
+
+          dropdown.appendChild(optionEl);
+        });
+      };
+
+      populateOptions();
+
+      select.addEventListener('change', () => {
+        const curOpt = getSelectedOpt();
+        if (curOpt) {
+          triggerText.textContent = curOpt.textContent;
+          dropdown.querySelectorAll('.custom-select-option').forEach((o, idx) => {
+            o.classList.toggle('selected', idx === select.selectedIndex);
+          });
+        }
+      });
+
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = wrapper.classList.contains('open');
+        document.querySelectorAll('.custom-select-wrapper.open').forEach(w => w.classList.remove('open'));
+        if (!isOpen) {
+          populateOptions();
+          wrapper.classList.add('open');
+        }
+      });
+
+      select.parentNode.insertBefore(wrapper, select);
+      wrapper.appendChild(select);
+      wrapper.appendChild(trigger);
+      wrapper.appendChild(dropdown);
+    });
+
+    if (!window._customSelectGlobalListenerAdded) {
+      window._customSelectGlobalListenerAdded = true;
+      document.addEventListener('click', () => {
+        document.querySelectorAll('.custom-select-wrapper.open').forEach(w => w.classList.remove('open'));
+      });
+    }
   }
 };

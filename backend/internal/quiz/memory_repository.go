@@ -50,7 +50,7 @@ func (r *memoryRepository) seedDefaultQuizzes() {
 			{
 				ID:            uuid.New().String(),
 				QuizID:        q1ID,
-				Category:      "Kerala Current Affairs",
+				Category:      "National Current Affairs",
 				QuestionText:  "Which Kerala port recently handled its largest container vessel, setting a new maritime milestone?",
 				OptionA:       "Cochin Port",
 				OptionB:       "Vizhinjam International Transhipment Deepwater Multipurpose Seaport",
@@ -111,7 +111,7 @@ func (r *memoryRepository) seedDefaultQuizzes() {
 			{
 				ID:            uuid.New().String(),
 				QuizID:        q2ID,
-				Category:      "Kerala Current Affairs",
+				Category:      "General Knowledge (GK)",
 				QuestionText:  "Who was awarded the prestigious Kerala Jyothi award for lifetime contributions to literature?",
 				OptionA:       "M. T. Vasudevan Nair",
 				OptionB:       "T. Padmanabhan",
@@ -172,7 +172,7 @@ func (r *memoryRepository) seedDefaultQuizzes() {
 			{
 				ID:            uuid.New().String(),
 				QuizID:        q3ID,
-				Category:      "Kerala Current Affairs",
+				Category:      "Environment & Regional Affairs",
 				QuestionText:  "Which Kerala sanctuary was declared a plastic-free eco-sensitive zone?",
 				OptionA:       "Periyar Tiger Reserve",
 				OptionB:       "Wayanad Wildlife Sanctuary",
@@ -419,13 +419,13 @@ func (r *memoryRepository) SaveAttempt(ctx context.Context, attemptID, quizID, g
 	pct := (float64(score) / float64(totalQuestions)) * 100
 	var msg string
 	if pct == 100 {
-		msg = fmt.Sprintf("Perfect score! You scored %d/%d on today's Kerala and India current affairs.", score, totalQuestions)
+		msg = fmt.Sprintf("Perfect score! You scored %d/%d on today's current affairs & general knowledge quiz.", score, totalQuestions)
 	} else if pct >= 60 {
 		msg = fmt.Sprintf("Great effort! You scored %d out of %d. Review the factual explanations below.", score, totalQuestions)
 	} else if pct > 0 {
 		msg = fmt.Sprintf("Good attempt! You scored %d out of %d. Learn from the detailed explanations.", score, totalQuestions)
 	} else {
-		msg = "Keep practicing! Every day builds stronger knowledge for Kerala PSC and competitive exams."
+		msg = "Keep practicing! Every day builds stronger knowledge for UPSC, SSC, Banking, Railways, State PSCs, and competitive exams."
 	}
 
 	result := &QuizAttemptResult{

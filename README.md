@@ -1,20 +1,20 @@
-# Quiz Keralam 🌴 Quiz Keralam
+# ThreeQ ⚡ Daily Current Affairs & General Knowledge Micro-Quiz
 
 > **3 Questions. 1 Minute. Every Day.**
 
-Quiz Keralam is a daily current-affairs micro-quiz platform focused on Kerala and India. Built for Kerala PSC aspirants, students, and WhatsApp learning groups.
+ThreeQ is a daily current-affairs and General Knowledge (GK) micro-quiz platform covering National affairs, International news, Science, Sports, Economy, and General Knowledge. Built for UPSC, SSC, Banking, Railways, State PSC aspirants, and daily habit-builders everywhere.
 
 ---
 
 ## 🚀 Key Features
 
-- **⚡ 1-Minute Daily Quiz**: Exactly 3 daily questions (Q1: Kerala Current Affairs, Q2: India Current Affairs, Q3: Special Topic).
+- **⚡ 1-Minute Daily Quiz**: Exactly 3 daily questions (Q1: National Current Affairs, Q2: International & World News, Q3: General Knowledge & Special Topics).
 - **🔒 Guest Access**: Users answer immediately without creating an account.
 - **📊 Instant Evaluation & Explanations**: Server-calculated scores (0-3) with clear factual explanations and news citations.
 - **📱 WhatsApp Sharing**: Single-tap WhatsApp group score sharing.
 - **🤖 Gemini AI Daily Generation**: Automated daily draft generation via Gemini API.
 - **🛡️ Admin Editorial System**: JWT-authenticated portal to review, edit, approve, and publish quizzes.
-- **🎨 Kerala Design Aesthetics**: Deep emerald green (`#065f46`), warm saffron orange (`#ea580c`), golden yellow, and custom visual motifs.
+- **🎨 Modern Glassmorphism UI**: Deep emerald green (`#065f46`), warm saffron orange (`#ea580c`), sleek glass cards, and micro-animations.
 
 ---
 

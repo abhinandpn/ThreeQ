@@ -106,16 +106,17 @@
 
     function renderAllQuestionInputs() {
       const container = document.getElementById('questions-forms-container');
-      const defaultCategories = ['Kerala Current Affairs', 'India National Current Affairs', 'General Science & Tech', 'Sports & Awards', 'Indian Economy'];
+      const defaultCategories = ['National Current Affairs', 'International & World News', 'General Knowledge (GK)', 'Science & Tech', 'Sports & Awards', 'Indian & Global Economy', 'History & Polity', 'Regional & State Affairs'];
       
       container.innerHTML = '';
       for (let i = 1; i <= questionsCount; i++) {
         const cat = defaultCategories[(i - 1) % defaultCategories.length];
         container.appendChild(createQuestionCardElement(i, cat));
       }
+      App.initCustomSelects();
     }
 
-    function createQuestionCardElement(i, defaultCategory = 'Kerala Current Affairs') {
+    function createQuestionCardElement(i, defaultCategory = 'National Current Affairs') {
       const card = document.createElement('div');
       card.className = 'glass-card question-card';
       card.id = `q_card_${i}`;
@@ -184,10 +185,11 @@
     function addQuestionCard() {
       questionsCount++;
       const container = document.getElementById('questions-forms-container');
-      const defaultCategories = ['Kerala Current Affairs', 'India National Current Affairs', 'General Science & Tech', 'Sports & Awards', 'Indian Economy'];
+      const defaultCategories = ['National Current Affairs', 'International & World News', 'General Knowledge (GK)', 'Science & Tech', 'Sports & Awards', 'Indian & Global Economy', 'History & Polity', 'Regional & State Affairs'];
       const cat = defaultCategories[(questionsCount - 1) % defaultCategories.length];
       
       container.appendChild(createQuestionCardElement(questionsCount, cat));
+      App.initCustomSelects();
       
       // Update remove buttons status on previous cards if needed
       updateRemoveButtonsVisibility();

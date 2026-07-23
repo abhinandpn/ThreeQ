@@ -113,7 +113,7 @@
         document.getElementById('score-msg').innerText = result.result_message;
 
         // WhatsApp Share Link
-        const shareText = `I scored ${result.score}/3 in today's ThreeQ current-affairs quiz! 🌴✨\nCan you beat my score?\n\nTake the 1-minute daily quiz here:\n${window.location.href}`;
+        const shareText = `I scored ${result.score}/3 in today's ThreeQ Daily Current Affairs & GK quiz! 🌐⚡\nCan you beat my score?\n\nTake the 1-minute daily quiz here:\n${window.location.href}`;
         document.getElementById('btn-whatsapp-share').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
         // Trigger confetti for score 3/3

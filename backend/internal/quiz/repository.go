@@ -476,13 +476,13 @@ func (r *repository) GetAttemptResult(ctx context.Context, attemptID string) (*Q
 	}
 
 	if pct == 100 {
-		res.ResultMessage = fmt.Sprintf("Perfect score! You scored %d/%d on today's Kerala and India current affairs.", res.Score, res.Total)
+		res.ResultMessage = fmt.Sprintf("Perfect score! You scored %d/%d on today's current affairs & general knowledge quiz.", res.Score, res.Total)
 	} else if pct >= 60 {
 		res.ResultMessage = fmt.Sprintf("Great effort! You scored %d out of %d. Review the factual explanations below.", res.Score, res.Total)
 	} else if pct > 0 {
 		res.ResultMessage = fmt.Sprintf("Good attempt! You scored %d out of %d. Learn from the detailed explanations.", res.Score, res.Total)
 	} else {
-		res.ResultMessage = "Keep practicing! Every day builds stronger knowledge for Kerala PSC and competitive exams."
+		res.ResultMessage = "Keep practicing! Every day builds stronger knowledge for UPSC, SSC, Banking, Railways, State PSCs, and competitive exams."
 	}
 
 	return &res, nil
