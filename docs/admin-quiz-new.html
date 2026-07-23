@@ -35,10 +35,13 @@
 
       <!-- Admin Main View -->
       <section class="admin-main">
-        <div style="margin-bottom: 1.5rem;">
-          <span class="badge badge-emerald" style="margin-bottom: 0.25rem;">Editor</span>
-          <h1 style="font-size: 1.75rem; font-weight: 900; color: #fff;">Create Daily Quiz Manually</h1>
-          <p style="font-size: 0.85rem; color: var(--text-secondary);">Draft a 3-question daily current affairs quiz</p>
+        <div style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <span class="badge badge-emerald" style="margin-bottom: 0.25rem;">Editor</span>
+            <h1 style="font-size: 1.75rem; font-weight: 900; color: #fff;">Create Daily Quiz</h1>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">Draft a daily quiz (minimum 3 questions required)</p>
+          </div>
+          <button type="button" class="btn btn-saffron" id="btn-add-question" style="font-size: 0.85rem; padding: 10px 16px;">➕ Add Question</button>
         </div>
 
         <div id="form-error" style="display: none; padding: 0.75rem; border-radius: 8px; background: rgba(239,68,68,0.15); color: #fca5a5; font-size: 0.85rem; margin-bottom: 1.25rem; border: 1px solid rgba(239,68,68,0.3);"></div>
@@ -55,14 +58,18 @@
             </div>
           </div>
 
-          <!-- 3 Questions Form -->
+          <!-- Dynamic Questions Form Container -->
           <div id="questions-forms-container" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
-            <!-- Question 1, 2, 3 injected dynamically -->
+            <!-- Question Cards Injected Dynamically -->
           </div>
 
-          <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-            <a href="admin-quizzes.html" class="btn btn-glass">Cancel</a>
-            <button type="submit" class="btn btn-emerald" id="btn-save-quiz">Save Draft Quiz →</button>
+          <div style="display: flex; gap: 1rem; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <button type="button" class="btn btn-glass" id="btn-add-question-bottom" style="width: auto;">➕ Add Question</button>
+
+            <div style="display: flex; gap: 1rem;">
+              <a href="admin-quizzes.html" class="btn btn-glass" style="width: auto;">Cancel</a>
+              <button type="submit" class="btn btn-emerald" id="btn-save-quiz" style="width: auto;">Save Draft Quiz →</button>
+            </div>
           </div>
         </form>
       </section>
@@ -76,6 +83,8 @@
   <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script>
+    let questionsCount = 3;
+
     document.addEventListener('DOMContentLoaded', () => {
       App.renderHeader('');
       App.renderFooter();
@@ -88,61 +97,166 @@
       document.getElementById('quiz_date').value = App.getTodayDateString();
       document.getElementById('title').value = `Daily Current Affairs - ${App.formatDateKolkata(App.getTodayDateString())}`;
 
-      renderQuestionInputs();
+      renderAllQuestionInputs();
 
+      document.getElementById('btn-add-question').addEventListener('click', addQuestionCard);
+      document.getElementById('btn-add-question-bottom').addEventListener('click', addQuestionCard);
       document.getElementById('create-quiz-form').addEventListener('submit', handleSaveQuiz);
     });
 
-    function renderQuestionInputs() {
-      const categories = ['Kerala Current Affairs', 'India National Current Affairs', 'General Science & Tech'];
+    function renderAllQuestionInputs() {
       const container = document.getElementById('questions-forms-container');
+      const defaultCategories = ['Kerala Current Affairs', 'India National Current Affairs', 'General Science & Tech', 'Sports & Awards', 'Indian Economy'];
+      
+      container.innerHTML = '';
+      for (let i = 1; i <= questionsCount; i++) {
+        const cat = defaultCategories[(i - 1) % defaultCategories.length];
+        container.appendChild(createQuestionCardElement(i, cat));
+      }
+    }
 
-      container.innerHTML = [1, 2, 3].map(i => `
-        <div class="glass-card" style="padding: 1.5rem;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-            <span class="badge badge-emerald">Question ${i} of 3</span>
-            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Category: ${categories[i-1]}</span>
-          </div>
+    function createQuestionCardElement(i, defaultCategory = 'Kerala Current Affairs') {
+      const card = document.createElement('div');
+      card.className = 'glass-card question-card';
+      card.id = `q_card_${i}`;
+      card.dataset.index = i;
+      card.style.padding = '1.5rem';
 
+      const isRemovable = questionsCount > 3;
+
+      card.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+          <span class="badge badge-emerald">Question ${i}</span>
+          ${isRemovable ? `<button type="button" class="btn btn-danger btn-remove-q" data-index="${i}" style="padding: 4px 10px; font-size: 0.75rem; width: auto; min-height: 28px;">🗑️ Remove Question</button>` : '<span style="font-size: 0.75rem; color: var(--text-muted);">Required Question (Min 3)</span>'}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <input type="text" id="q${i}_category" class="form-input" value="${defaultCategory}" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Question Text</label>
+          <textarea id="q${i}_text" class="form-textarea" rows="2" required placeholder="Enter clear multiple-choice question text..."></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
+          <div class="form-group"><label class="form-label">Option A</label><input type="text" id="q${i}_opt_a" class="form-input" required></div>
+          <div class="form-group"><label class="form-label">Option B</label><input type="text" id="q${i}_opt_b" class="form-input" required></div>
+          <div class="form-group"><label class="form-label">Option C</label><input type="text" id="q${i}_opt_c" class="form-input" required></div>
+          <div class="form-group"><label class="form-label">Option D</label><input type="text" id="q${i}_opt_d" class="form-input" required></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
           <div class="form-group">
-            <label class="form-label">Category</label>
-            <input type="text" id="q${i}_category" class="form-input" value="${categories[i-1]}" required>
+            <label class="form-label">Correct Option</label>
+            <select id="q${i}_correct" class="form-select" required>
+              <option value="A">Option A</option>
+              <option value="B">Option B</option>
+              <option value="C">Option C</option>
+              <option value="D">Option D</option>
+            </select>
           </div>
-
           <div class="form-group">
-            <label class="form-label">Question Text</label>
-            <textarea id="q${i}_text" class="form-textarea" rows="2" required placeholder="Enter clear multiple-choice question text..."></textarea>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-            <div class="form-group"><label class="form-label">Option A</label><input type="text" id="q${i}_opt_a" class="form-input" required></div>
-            <div class="form-group"><label class="form-label">Option B</label><input type="text" id="q${i}_opt_b" class="form-input" required></div>
-            <div class="form-group"><label class="form-label">Option C</label><input type="text" id="q${i}_opt_c" class="form-input" required></div>
-            <div class="form-group"><label class="form-label">Option D</label><input type="text" id="q${i}_opt_d" class="form-input" required></div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 0.75rem; margin-bottom: 1rem;">
-            <div class="form-group">
-              <label class="form-label">Correct Option</label>
-              <select id="q${i}_correct" class="form-select" required>
-                <option value="A">Option A</option>
-                <option value="B">Option B</option>
-                <option value="C">Option C</option>
-                <option value="D">Option D</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Factual Explanation (&lt;80 words)</label>
-              <input type="text" id="q${i}_exp" class="form-input" required placeholder="Factual explanation for the correct answer...">
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-            <div class="form-group"><label class="form-label">Source Name</label><input type="text" id="q${i}_src_name" class="form-input" value="The Hindu" required></div>
-            <div class="form-group"><label class="form-label">Source URL</label><input type="url" id="q${i}_src_url" class="form-input" value="https://thehindu.com" required></div>
+            <label class="form-label">Factual Explanation</label>
+            <input type="text" id="q${i}_exp" class="form-input" required placeholder="Factual explanation for the correct answer...">
           </div>
         </div>
-      `).join('');
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+          <div class="form-group"><label class="form-label">Source Name</label><input type="text" id="q${i}_src_name" class="form-input" value="The Hindu" required></div>
+          <div class="form-group"><label class="form-label">Source URL</label><input type="url" id="q${i}_src_url" class="form-input" value="https://thehindu.com" required></div>
+        </div>
+      `;
+
+      if (isRemovable) {
+        setTimeout(() => {
+          const rmBtn = card.querySelector('.btn-remove-q');
+          if (rmBtn) {
+            rmBtn.addEventListener('click', () => removeQuestionCard(i));
+          }
+        }, 0);
+      }
+
+      return card;
+    }
+
+    function addQuestionCard() {
+      questionsCount++;
+      const container = document.getElementById('questions-forms-container');
+      const defaultCategories = ['Kerala Current Affairs', 'India National Current Affairs', 'General Science & Tech', 'Sports & Awards', 'Indian Economy'];
+      const cat = defaultCategories[(questionsCount - 1) % defaultCategories.length];
+      
+      container.appendChild(createQuestionCardElement(questionsCount, cat));
+      
+      // Update remove buttons status on previous cards if needed
+      updateRemoveButtonsVisibility();
+
+      // Smooth scroll to the newly added card
+      const newCard = document.getElementById(`q_card_${questionsCount}`);
+      if (newCard) {
+        newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function removeQuestionCard(idx) {
+      if (questionsCount <= 3) return;
+      const card = document.getElementById(`q_card_${idx}`);
+      if (card) {
+        card.remove();
+        questionsCount--;
+        reindexQuestionCards();
+      }
+    }
+
+    function reindexQuestionCards() {
+      const container = document.getElementById('questions-forms-container');
+      const cards = container.querySelectorAll('.question-card');
+      questionsCount = cards.length;
+
+      cards.forEach((card, idx) => {
+        const newIndex = idx + 1;
+        card.id = `q_card_${newIndex}`;
+        card.dataset.index = newIndex;
+
+        const badge = card.querySelector('.badge');
+        if (badge) badge.textContent = `Question ${newIndex}`;
+
+        // Reindex input IDs inside
+        card.querySelectorAll('input, select, textarea').forEach(el => {
+          const oldId = el.id;
+          if (oldId && oldId.startsWith('q')) {
+            const parts = oldId.split('_');
+            parts[0] = `q${newIndex}`;
+            el.id = parts.join('_');
+          }
+        });
+      });
+
+      updateRemoveButtonsVisibility();
+    }
+
+    function updateRemoveButtonsVisibility() {
+      const container = document.getElementById('questions-forms-container');
+      const cards = container.querySelectorAll('.question-card');
+      cards.forEach((card, idx) => {
+        const header = card.querySelector('div');
+        let rmBtn = card.querySelector('.btn-remove-q');
+        
+        if (cards.length > 3) {
+          if (!rmBtn) {
+            const newRmBtn = document.createElement('button');
+            newRmBtn.type = 'button';
+            newRmBtn.className = 'btn btn-danger btn-remove-q';
+            newRmBtn.style = 'padding: 4px 10px; font-size: 0.75rem; width: auto; min-height: 28px;';
+            newRmBtn.textContent = '🗑️ Remove Question';
+            newRmBtn.addEventListener('click', () => removeQuestionCard(idx + 1));
+            header.appendChild(newRmBtn);
+          }
+        } else {
+          if (rmBtn) rmBtn.remove();
+        }
+      });
     }
 
     async function handleSaveQuiz(e) {
@@ -151,22 +265,46 @@
       const btn = document.getElementById('btn-save-quiz');
       errEl.style.display = 'none';
 
+      if (questionsCount < 3) {
+        errEl.innerText = 'Quiz must contain a minimum of 3 questions.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      const questionsList = [];
+      for (let i = 1; i <= questionsCount; i++) {
+        const catEl = document.getElementById(`q${i}_category`);
+        const textEl = document.getElementById(`q${i}_text`);
+        const optAEl = document.getElementById(`q${i}_opt_a`);
+        const optBEl = document.getElementById(`q${i}_opt_b`);
+        const optCEl = document.getElementById(`q${i}_opt_c`);
+        const optDEl = document.getElementById(`q${i}_opt_d`);
+        const corrEl = document.getElementById(`q${i}_correct`);
+        const expEl = document.getElementById(`q${i}_exp`);
+        const srcNameEl = document.getElementById(`q${i}_src_name`);
+        const srcUrlEl = document.getElementById(`q${i}_src_url`);
+
+        if (!textEl || !optAEl) continue;
+
+        questionsList.push({
+          display_order: i,
+          category: catEl ? catEl.value : 'General Current Affairs',
+          question_text: textEl.value,
+          option_a: optAEl.value,
+          option_b: optBEl.value,
+          option_c: optCEl.value,
+          option_d: optDEl.value,
+          correct_option: corrEl.value,
+          explanation: expEl.value,
+          source_name: srcNameEl.value,
+          source_url: srcUrlEl.value,
+        });
+      }
+
       const payload = {
         quiz_date: document.getElementById('quiz_date').value,
         title: document.getElementById('title').value,
-        questions: [1, 2, 3].map(i => ({
-          question_number: i,
-          category: document.getElementById(`q${i}_category`).value,
-          question_text: document.getElementById(`q${i}_text`).value,
-          option_a: document.getElementById(`q${i}_opt_a`).value,
-          option_b: document.getElementById(`q${i}_opt_b`).value,
-          option_c: document.getElementById(`q${i}_opt_c`).value,
-          option_d: document.getElementById(`q${i}_opt_d`).value,
-          correct_option: document.getElementById(`q${i}_correct`).value,
-          explanation: document.getElementById(`q${i}_exp`).value,
-          source_name: document.getElementById(`q${i}_src_name`).value,
-          source_url: document.getElementById(`q${i}_src_url`).value,
-        }))
+        questions: questionsList
       };
 
       btn.innerText = 'Saving...';

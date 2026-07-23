@@ -411,15 +411,20 @@ func (r *memoryRepository) SaveAttempt(ctx context.Context, attemptID, quizID, g
 		})
 	}
 
+	totalQuestions := len(quiz.Questions)
+	if totalQuestions == 0 {
+		totalQuestions = len(answers)
+	}
+
+	pct := (float64(score) / float64(totalQuestions)) * 100
 	var msg string
-	switch score {
-	case 3:
-		msg = "Perfect score! You mastered today's Kerala and India current affairs."
-	case 2:
-		msg = "Great effort! You scored 2 out of 3. Review the factual explanation below."
-	case 1:
-		msg = "Good attempt! You got 1 correct answer. Learn from the detailed explanations."
-	default:
+	if pct == 100 {
+		msg = fmt.Sprintf("Perfect score! You scored %d/%d on today's Kerala and India current affairs.", score, totalQuestions)
+	} else if pct >= 60 {
+		msg = fmt.Sprintf("Great effort! You scored %d out of %d. Review the factual explanations below.", score, totalQuestions)
+	} else if pct > 0 {
+		msg = fmt.Sprintf("Good attempt! You scored %d out of %d. Learn from the detailed explanations.", score, totalQuestions)
+	} else {
 		msg = "Keep practicing! Every day builds stronger knowledge for Kerala PSC and competitive exams."
 	}
 
@@ -429,7 +434,7 @@ func (r *memoryRepository) SaveAttempt(ctx context.Context, attemptID, quizID, g
 		QuizDate:      quiz.QuizDate,
 		Title:         quiz.Title,
 		Score:         score,
-		Total:         3,
+		Total:         totalQuestions,
 		ResultMessage: msg,
 		Answers:       detailedAnswers,
 	}

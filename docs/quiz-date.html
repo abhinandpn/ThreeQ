@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Previous Quiz - ThreeQ</title>
+  <title>Quiz by Date - ThreeQ</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,44 +13,45 @@
 
   <div id="header-root"></div>
 
-  <main class="main-content" style="max-width: 700px;">
-    <!-- Title Header -->
-    <div style="text-align: center; margin-bottom: 1.5rem;">
-      <span class="badge badge-saffron" id="quiz-date-badge" style="margin-bottom: 0.5rem;">Previous Quiz</span>
-      <h1 style="font-size: 2rem; font-weight: 900; color: #fff;" id="quiz-title-heading">Daily Quiz</h1>
+  <main class="main-content">
+    <!-- Quiz Card Header -->
+    <div style="margin-bottom: 1.5rem; text-align: center;">
+      <span class="badge badge-emerald" style="margin-bottom: 0.5rem;" id="quiz-date-badge">Quiz Archive</span>
+      <h1 style="font-size: 2rem; font-weight: 900; color: #fff;" id="quiz-title-heading">Daily Current Affairs</h1>
+      <p style="font-size: 0.9rem; color: var(--text-secondary);">Practice archived current affairs micro-quiz</p>
     </div>
 
-    <!-- Loading Container -->
-    <div id="loading-container" class="glass-card" style="text-align: center; padding: 3rem;">
-      <div style="color: var(--emerald-light); font-size: 1.5rem; margin-bottom: 0.5rem;">⚡</div>
-      <p style="color: var(--text-secondary); font-size: 0.9rem;">Fetching quiz for date...</p>
-    </div>
-
-    <!-- Error Container -->
-    <div id="error-container" class="glass-card" style="display: none; text-align: center; border-color: rgba(239,68,68,0.3);">
-      <div style="font-size: 2rem; margin-bottom: 0.5rem;">📅</div>
+    <!-- Error State -->
+    <div id="error-container" style="display: none; padding: 2rem; text-align: center;" class="glass-card">
+      <div style="font-size: 2.5rem; margin-bottom: 1rem;">🗓️</div>
       <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">Quiz Not Found</h3>
-      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;" id="error-message-text">We could not find a published quiz for this date.</p>
-      <a href="archive.html" class="btn btn-emerald">Explore Quiz Archive →</a>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;" id="error-message">No published quiz found for this date.</p>
+      <a href="archive.html" class="btn btn-emerald">Browse Quiz Archive →</a>
     </div>
 
-    <!-- Stepper Quiz Card -->
-    <div id="quiz-card-container" class="glass-card" style="display: none;">
-      <!-- Progress Bar & Category -->
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-        <span class="badge badge-emerald" id="question-category">Category</span>
-        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
-          Question <span id="current-q-num" style="color: var(--emerald-light); font-weight: 900;">1</span> of 3
-        </span>
+    <!-- Loading Skeleton -->
+    <div id="loading-container" class="glass-card" style="padding: 2.5rem; text-align: center;">
+      <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 1rem;">
+        <div class="logo-badge" style="animation: pulse 1.5s infinite;">3Q</div>
+      </div>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; font-family: var(--font-mono);">Fetching quiz questions...</p>
+    </div>
+
+    <!-- Active Question Stepper Card -->
+    <div id="quiz-card-container" class="glass-card glass-card-emerald" style="display: none;">
+      <!-- Progress Bar -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">
+        <span>Question <span id="current-q-num">1</span> of <span id="total-q-num">3</span></span>
+        <span class="badge badge-saffron" id="question-category">Kerala Current Affairs</span>
       </div>
 
-      <div class="progress-container" style="margin-bottom: 1.5rem;">
-        <div class="progress-bar" id="progress-bar-fill" style="width: 33.3%;"></div>
+      <div class="progress-container" style="margin-bottom: 1.75rem;">
+        <div class="progress-bar" id="progress-bar-fill" style="width: 33%;"></div>
       </div>
 
       <!-- Question Text -->
-      <h2 id="question-text" style="font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 1.5rem; line-height: 1.4;">
-        Question text...
+      <h2 style="font-size: 1.25rem; font-weight: 800; color: #fff; line-height: 1.45; margin-bottom: 1.5rem;" id="question-text">
+        Loading question text...
       </h2>
 
       <!-- Options -->
@@ -58,8 +59,8 @@
 
       <!-- Controls -->
       <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-        <button type="button" class="btn btn-glass" id="btn-prev" disabled>← Previous</button>
-        <button type="button" class="btn btn-emerald" id="btn-next" disabled>Next Question →</button>
+        <button type="button" class="btn btn-glass" id="btn-prev" disabled style="width: auto;">← Previous</button>
+        <button type="button" class="btn btn-emerald" id="btn-next" disabled style="width: auto;">Next Question →</button>
       </div>
     </div>
   </main>
@@ -75,12 +76,15 @@
         <p style="font-size: 0.85rem; color: var(--text-secondary);">Review your answers before submitting for official score calculation.</p>
       </div>
 
-      <div id="summary-answers-list" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;"></div>
+      <div id="summary-answers-list" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <!-- Injected dynamically -->
+      </div>
+
       <div id="submit-error" style="display: none; padding: 0.75rem; border-radius: 8px; background: rgba(239,68,68,0.15); color: #fca5a5; font-size: 0.85rem; margin-bottom: 1rem;"></div>
 
       <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
-        <button type="button" class="btn btn-glass" id="btn-modal-back">Back</button>
-        <button type="button" class="btn btn-saffron" id="btn-modal-submit">Submit Answers 🚀</button>
+        <button type="button" class="btn btn-glass" id="btn-modal-back" style="width: auto;">Back</button>
+        <button type="button" class="btn btn-saffron" id="btn-modal-submit" style="width: auto;">Submit Answers 🚀</button>
       </div>
     </div>
   </div>
@@ -98,7 +102,7 @@
     let isSubmitting = false;
 
     document.addEventListener('DOMContentLoaded', () => {
-      App.renderHeader('');
+      App.renderHeader('archive');
       App.renderFooter();
 
       const urlParams = new URLSearchParams(window.location.search);
@@ -129,8 +133,9 @@
           return;
         }
 
-        document.getElementById('quiz-date-badge').innerText = `Archive Quiz • ${App.formatDateKolkata(currentQuiz.quiz_date)}`;
+        document.getElementById('quiz-date-badge').innerText = `Daily Quiz • ${currentQuiz.quiz_date}`;
         document.getElementById('quiz-title-heading').innerText = currentQuiz.title;
+        document.getElementById('total-q-num').innerText = currentQuiz.questions.length;
 
         const draft = Storage.getDraftAnswers(currentQuiz.id);
         if (draft) selectedAnswers = draft;
@@ -138,19 +143,21 @@
         document.getElementById('quiz-card-container').style.display = 'block';
         renderQuestion();
       } catch (err) {
-        console.error('Load quiz date error:', err);
+        console.error('Load quiz by date error:', err);
         document.getElementById('loading-container').style.display = 'none';
-        showError(err.message || 'No published quiz found for this date.');
+        showError(err.message || `No published quiz found for ${date}.`);
       }
     }
 
     function renderQuestion() {
+      const totalQ = currentQuiz.questions.length;
       const q = currentQuiz.questions[currentIndex];
       document.getElementById('current-q-num').innerText = currentIndex + 1;
+      document.getElementById('total-q-num').innerText = totalQ;
       document.getElementById('question-category').innerText = q.category;
       document.getElementById('question-text').innerText = q.question_text;
 
-      const progress = ((currentIndex + 1) / 3) * 100;
+      const progress = ((currentIndex + 1) / totalQ) * 100;
       document.getElementById('progress-bar-fill').style.width = `${progress}%`;
 
       const options = [
@@ -173,13 +180,15 @@
       const isCurrentAnswered = !!selectedAnswers[q.id];
 
       const btnNext = document.getElementById('btn-next');
-      if (currentIndex === 2) {
+      if (currentIndex === totalQ - 1) {
         btnNext.innerText = 'Review & Submit →';
         btnNext.className = 'btn btn-saffron';
+        btnNext.style.width = 'auto';
         btnNext.disabled = !allQuestionsAnswered();
       } else {
         btnNext.innerText = 'Next Question →';
         btnNext.className = 'btn btn-emerald';
+        btnNext.style.width = 'auto';
         btnNext.disabled = !isCurrentAnswered;
       }
     }
@@ -191,11 +200,12 @@
     }
 
     function allQuestionsAnswered() {
-      return currentQuiz && currentQuiz.questions.length === 3 && currentQuiz.questions.every(q => !!selectedAnswers[q.id]);
+      return currentQuiz && currentQuiz.questions && currentQuiz.questions.length > 0 && currentQuiz.questions.every(q => !!selectedAnswers[q.id]);
     }
 
     function handleNext() {
-      if (currentIndex < 2) {
+      const totalQ = currentQuiz.questions.length;
+      if (currentIndex < totalQ - 1) {
         currentIndex++;
         renderQuestion();
       } else if (allQuestionsAnswered()) {
@@ -212,49 +222,55 @@
 
     function showSummaryModal() {
       const listEl = document.getElementById('summary-answers-list');
-      listEl.innerHTML = currentQuiz.questions.map((q, idx) => `
-        <div style="padding: 0.85rem 1rem; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
-          <div>
-            <span style="font-size: 0.75rem; font-weight: 700; color: var(--emerald-light); text-transform: uppercase;">Q${idx + 1} • ${q.category}</span>
-            <p style="font-size: 0.85rem; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">${q.question_text}</p>
+      listEl.innerHTML = currentQuiz.questions.map((q, idx) => {
+        const selected = selectedAnswers[q.id];
+        return `
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-color);">
+            <span style="font-size: 0.85rem; font-weight: 700; color: #fff;">Q${idx + 1}: ${q.category}</span>
+            <span class="badge badge-emerald">Option ${selected} Selected</span>
           </div>
-          <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--emerald-main); color: #fff; font-weight: 900; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">${selectedAnswers[q.id]}</div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
       document.getElementById('summary-modal').classList.add('open');
     }
 
     async function submitQuiz() {
       if (isSubmitting) return;
+
+      const submitBtn = document.getElementById('btn-modal-submit');
+      const errEl = document.getElementById('submit-error');
+      errEl.style.display = 'none';
+
+      submitBtn.innerText = 'Submitting...';
+      submitBtn.disabled = true;
       isSubmitting = true;
 
-      const submitErrEl = document.getElementById('submit-error');
-      submitErrEl.style.display = 'none';
-
-      const guestId = Storage.getOrCreateGuestId();
       const payload = {
-        guest_id: guestId,
+        guest_id: Storage.getGuestId(),
         answers: currentQuiz.questions.map(q => ({
           question_id: q.id,
-          selected_option: selectedAnswers[q.id]
+          selected_option: selectedAnswers[q.id],
         }))
       };
 
       try {
         const result = await API.submitQuiz(currentQuiz.id, payload);
         Storage.clearDraftAnswers(currentQuiz.id);
-        window.location.href = `result.html?id=${result.attempt_id}`;
+        Storage.saveAttempt(result);
+        window.location.href = `result.html?attempt_id=${result.attempt_id}`;
       } catch (err) {
         console.error('Submit quiz error:', err);
-        submitErrEl.innerText = err.message || 'Failed to submit answers. Please try again.';
-        submitErrEl.style.display = 'block';
+        errEl.innerText = err.message || 'Failed to submit quiz. Please try again.';
+        errEl.style.display = 'block';
+        submitBtn.innerText = 'Submit Answers 🚀';
+        submitBtn.disabled = false;
         isSubmitting = false;
       }
     }
 
     function showError(msg) {
-      document.getElementById('error-message-text').innerText = msg;
+      document.getElementById('error-message').innerText = msg;
       document.getElementById('error-container').style.display = 'block';
     }
   </script>

@@ -435,20 +435,6 @@ func (r *repository) GetAttemptResult(ctx context.Context, attemptID string) (*Q
 	}
 
 	res.QuizDate = quizDate.Format("2006-01-02")
-	res.Total = 3
-
-	switch res.Score {
-	case 0:
-		res.ResultMessage = "Good start. Read the explanations and come back stronger tomorrow."
-	case 1:
-		res.ResultMessage = "You are learning. One correct answer today can become three tomorrow."
-	case 2:
-		res.ResultMessage = "Great work. You were just one answer away from a perfect score."
-	case 3:
-		res.ResultMessage = "Perfect score! You mastered today's current affairs."
-	default:
-		res.ResultMessage = "Quiz completed!"
-	}
 
 	answersQuery := `
 		SELECT q.id, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
@@ -481,6 +467,22 @@ func (r *repository) GetAttemptResult(ctx context.Context, attemptID string) (*Q
 			da.SourceDate = &formatted
 		}
 		res.Answers = append(res.Answers, da)
+	}
+
+	res.Total = len(res.Answers)
+	pct := 0.0
+	if res.Total > 0 {
+		pct = (float64(res.Score) / float64(res.Total)) * 100
+	}
+
+	if pct == 100 {
+		res.ResultMessage = fmt.Sprintf("Perfect score! You scored %d/%d on today's Kerala and India current affairs.", res.Score, res.Total)
+	} else if pct >= 60 {
+		res.ResultMessage = fmt.Sprintf("Great effort! You scored %d out of %d. Review the factual explanations below.", res.Score, res.Total)
+	} else if pct > 0 {
+		res.ResultMessage = fmt.Sprintf("Good attempt! You scored %d out of %d. Learn from the detailed explanations.", res.Score, res.Total)
+	} else {
+		res.ResultMessage = "Keep practicing! Every day builds stronger knowledge for Kerala PSC and competitive exams."
 	}
 
 	return &res, nil

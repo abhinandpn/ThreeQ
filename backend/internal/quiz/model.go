@@ -32,22 +32,22 @@ type Quiz struct {
 }
 
 type Question struct {
-	ID           string    `json:"id"`
-	QuizID       string    `json:"quiz_id"`
-	QuestionText string    `json:"question_text"`
-	OptionA      string    `json:"option_a"`
-	OptionB      string    `json:"option_b"`
-	OptionC      string    `json:"option_c"`
-	OptionD      string    `json:"option_d"`
-	CorrectOption string   `json:"correct_option,omitempty"` // Omitted in public GET quiz requests
-	Explanation  string    `json:"explanation,omitempty"`  // Omitted in public GET quiz requests
-	Category     string    `json:"category"`
-	SourceName   string    `json:"source_name"`
-	SourceURL    string    `json:"source_url"`
-	SourceDate   *string   `json:"source_date,omitempty"`
-	DisplayOrder int       `json:"display_order"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID            string    `json:"id"`
+	QuizID        string    `json:"quiz_id"`
+	QuestionText  string    `json:"question_text"`
+	OptionA       string    `json:"option_a"`
+	OptionB       string    `json:"option_b"`
+	OptionC       string    `json:"option_c"`
+	OptionD       string    `json:"option_d"`
+	CorrectOption string    `json:"correct_option,omitempty"` // Omitted in public GET quiz requests
+	Explanation   string    `json:"explanation,omitempty"`    // Omitted in public GET quiz requests
+	Category      string    `json:"category"`
+	SourceName    string    `json:"source_name"`
+	SourceURL     string    `json:"source_url"`
+	SourceDate    *string   `json:"source_date,omitempty"`
+	DisplayOrder  int       `json:"display_order"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // Public representations (where answers/explanations are concealed)
@@ -71,8 +71,8 @@ type PublicQuestion struct {
 
 // Submission DTOs
 type QuizSubmissionRequest struct {
-	GuestID string            `json:"guest_id"`
-	Answers []QuestionAnswer  `json:"answers" binding:"required,len=3"`
+	GuestID string           `json:"guest_id"`
+	Answers []QuestionAnswer `json:"answers" binding:"required,min=1"`
 }
 
 type QuestionAnswer struct {
@@ -81,14 +81,14 @@ type QuestionAnswer struct {
 }
 
 type QuizAttemptResult struct {
-	AttemptID   string              `json:"attempt_id"`
-	QuizID      string              `json:"quiz_id"`
-	QuizDate    string              `json:"quiz_date"`
-	Title       string              `json:"title"`
-	Score       int                 `json:"score"`
-	Total       int                 `json:"total"`
-	ResultMessage string            `json:"result_message"`
-	Answers     []DetailedAnswer `json:"answers"`
+	AttemptID     string           `json:"attempt_id"`
+	QuizID        string           `json:"quiz_id"`
+	QuizDate      string           `json:"quiz_date"`
+	Title         string           `json:"title"`
+	Score         int              `json:"score"`
+	Total         int              `json:"total"`
+	ResultMessage string           `json:"result_message"`
+	Answers       []DetailedAnswer `json:"answers"`
 }
 
 type DetailedAnswer struct {
@@ -109,11 +109,11 @@ type DetailedAnswer struct {
 	DisplayOrder   int     `json:"display_order"`
 }
 
-// Admin DTOs
+// Admin DTOs (3 questions minimum)
 type CreateQuizRequest struct {
-	QuizDate  string               `json:"quiz_date" binding:"required"`
-	Title     string               `json:"title" binding:"required"`
-	Questions []CreateQuestionDTO  `json:"questions" binding:"required,len=3"`
+	QuizDate  string              `json:"quiz_date" binding:"required"`
+	Title     string              `json:"title" binding:"required"`
+	Questions []CreateQuestionDTO `json:"questions" binding:"required,min=3"`
 }
 
 type CreateQuestionDTO struct {
@@ -128,13 +128,13 @@ type CreateQuestionDTO struct {
 	SourceName    string  `json:"source_name" binding:"required"`
 	SourceURL     string  `json:"source_url" binding:"required"`
 	SourceDate    *string `json:"source_date"`
-	DisplayOrder  int     `json:"display_order" binding:"required,min=1,max=3"`
+	DisplayOrder  int     `json:"display_order" binding:"required,min=1"`
 }
 
 type AdminDashboardStats struct {
-	TodayQuizStatus   string `json:"today_quiz_status"`
-	TotalPublished    int    `json:"total_published"`
-	TotalAttempts     int    `json:"total_attempts"`
-	AverageScore      float64`json:"average_score"`
-	RecentQuizzes     []Quiz `json:"recent_quizzes"`
+	TodayQuizStatus string `json:"today_quiz_status"`
+	TotalPublished  int    `json:"total_published"`
+	TotalAttempts   int    `json:"total_attempts"`
+	AverageScore    float64`json:"average_score"`
+	RecentQuizzes   []Quiz `json:"recent_quizzes"`
 }

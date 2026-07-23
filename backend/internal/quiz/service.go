@@ -93,8 +93,8 @@ func (s *service) SubmitQuiz(ctx context.Context, quizID string, req QuizSubmiss
 		return nil, errors.New("cannot submit answers for unpublished quiz")
 	}
 
-	if len(req.Answers) != 3 {
-		return nil, errors.New("must submit exactly 3 answers")
+	if len(req.Answers) == 0 {
+		return nil, errors.New("answers submission cannot be empty")
 	}
 
 	// Build map of questions by ID for validation and scoring
@@ -156,8 +156,8 @@ func (s *service) ListAllQuizzes(ctx context.Context, status string, page, pageS
 }
 
 func (s *service) CreateQuiz(ctx context.Context, req CreateQuizRequest) (*Quiz, error) {
-	if len(req.Questions) != 3 {
-		return nil, errors.New("quiz must contain exactly 3 questions")
+	if len(req.Questions) < 3 {
+		return nil, errors.New("quiz must contain at least 3 questions")
 	}
 
 	q := &Quiz{
@@ -167,8 +167,12 @@ func (s *service) CreateQuiz(ctx context.Context, req CreateQuizRequest) (*Quiz,
 		GeneratedBy: GeneratedByManual,
 	}
 
-	questions := make([]Question, 3)
+	questions := make([]Question, len(req.Questions))
 	for i, qDto := range req.Questions {
+		displayOrder := qDto.DisplayOrder
+		if displayOrder < 1 {
+			displayOrder = i + 1
+		}
 		questions[i] = Question{
 			QuestionText:  qDto.QuestionText,
 			OptionA:       qDto.OptionA,
@@ -181,7 +185,7 @@ func (s *service) CreateQuiz(ctx context.Context, req CreateQuizRequest) (*Quiz,
 			SourceName:    qDto.SourceName,
 			SourceURL:     qDto.SourceURL,
 			SourceDate:    qDto.SourceDate,
-			DisplayOrder:  qDto.DisplayOrder,
+			DisplayOrder:  displayOrder,
 		}
 	}
 	q.Questions = questions
@@ -194,8 +198,8 @@ func (s *service) CreateQuiz(ctx context.Context, req CreateQuizRequest) (*Quiz,
 }
 
 func (s *service) UpdateQuiz(ctx context.Context, id string, req CreateQuizRequest) (*Quiz, error) {
-	if len(req.Questions) != 3 {
-		return nil, errors.New("quiz must contain exactly 3 questions")
+	if len(req.Questions) < 3 {
+		return nil, errors.New("quiz must contain at least 3 questions")
 	}
 
 	existing, err := s.repo.GetQuizByID(ctx, id)
@@ -206,8 +210,12 @@ func (s *service) UpdateQuiz(ctx context.Context, id string, req CreateQuizReque
 	existing.QuizDate = req.QuizDate
 	existing.Title = req.Title
 
-	questions := make([]Question, 3)
+	questions := make([]Question, len(req.Questions))
 	for i, qDto := range req.Questions {
+		displayOrder := qDto.DisplayOrder
+		if displayOrder < 1 {
+			displayOrder = i + 1
+		}
 		questions[i] = Question{
 			QuizID:        id,
 			QuestionText:  qDto.QuestionText,
@@ -221,7 +229,7 @@ func (s *service) UpdateQuiz(ctx context.Context, id string, req CreateQuizReque
 			SourceName:    qDto.SourceName,
 			SourceURL:     qDto.SourceURL,
 			SourceDate:    qDto.SourceDate,
-			DisplayOrder:  qDto.DisplayOrder,
+			DisplayOrder:  displayOrder,
 		}
 	}
 	existing.Questions = questions
