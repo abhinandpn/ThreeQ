@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS generation_logs;
+DROP TABLE IF EXISTS attempt_answers;
+DROP TABLE IF EXISTS quiz_attempts;
+DROP TABLE IF EXISTS questions;
+DROP TABLE IF EXISTS quizzes;
+DROP TABLE IF EXISTS admins;

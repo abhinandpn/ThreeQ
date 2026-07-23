@@ -1,0 +1,32 @@
+name: Generate Daily Quiz
+
+on:
+  schedule:
+    # 01:30 UTC = 07:00 AM Asia/Kolkata (IST)
+    - cron: '30 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  generate_quiz:
+    name: Trigger Daily Quiz Generation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call protected quiz generation API endpoint
+        run: |
+          echo "Triggering daily quiz draft generation on Quiz Keralam Backend..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.BACKEND_API_URL }}/api/v1/admin/quizzes/generate" \
+            -H "Content-Type: application/json" \
+            -H "X-Admin-Generation-Key: ${{ secrets.ADMIN_GENERATION_KEY }}")
+          
+          HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          
+          echo "Response HTTP Status Code: $HTTP_CODE"
+          echo "Response Body: $HTTP_BODY"
+          
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -gte 300 ]; then
+            echo "::error::API returned non-2xx status code: $HTTP_CODE"
+            exit 1
+          fi
+          
+          echo "Daily draft quiz generated successfully!"
