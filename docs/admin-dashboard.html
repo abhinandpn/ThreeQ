@@ -180,7 +180,7 @@
         window.location.href = `admin-quiz-edit.html?id=${generated.id}`;
       } catch (err) {
         console.error('Generation failed:', err);
-        alertEl.innerText = `Generation error: ${err.message}`;
+        alertEl.innerText = err.message || 'Quiz generation could not be completed. Please try again.';
         alertEl.style.display = 'block';
         btn.innerText = '✨ Generate Today\'s Quiz (AI)';
         btn.disabled = false;

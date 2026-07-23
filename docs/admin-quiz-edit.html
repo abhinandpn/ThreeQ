@@ -128,9 +128,14 @@
       const container = document.getElementById('questions-edit-container');
       container.innerHTML = questions.map((q, idx) => `
         <div class="glass-card" style="padding: 1.5rem;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.5rem;">
             <span class="badge badge-emerald">Question ${idx + 1} of 3</span>
-            <span class="badge badge-slate">${q.category}</span>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <span class="badge badge-slate">${q.category}</span>
+              <span class="badge ${q.difficulty === 'hard' ? 'badge-saffron' : q.difficulty === 'simple' ? 'badge-emerald' : 'badge-slate'}">
+                ${q.difficulty === 'hard' ? '🔴' : q.difficulty === 'simple' ? '🟢' : '🟡'} ${(q.difficulty || 'medium').replace(/^./, value => value.toUpperCase())}
+              </span>
+            </div>
           </div>
 
           <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 1rem; line-height: 1.4;">${q.question_text}</h3>

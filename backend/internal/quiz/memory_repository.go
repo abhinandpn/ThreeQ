@@ -322,6 +322,12 @@ func (r *memoryRepository) CreateQuiz(ctx context.Context, quiz *Quiz) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
+	for _, existing := range r.quizzes {
+		if existing.QuizDate == quiz.QuizDate {
+			return fmt.Errorf("%w: %s", ErrQuizDateAlreadyExists, quiz.QuizDate)
+		}
+	}
+
 	if quiz.ID == "" {
 		quiz.ID = uuid.New().String()
 	}
@@ -397,6 +403,7 @@ func (r *memoryRepository) SaveAttempt(ctx context.Context, attemptID, quizID, g
 			QuestionID:     q.ID,
 			DisplayOrder:   q.DisplayOrder,
 			Category:       q.Category,
+			Difficulty:     q.Difficulty,
 			QuestionText:   q.QuestionText,
 			OptionA:        q.OptionA,
 			OptionB:        q.OptionB,

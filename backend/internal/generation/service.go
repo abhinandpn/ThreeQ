@@ -69,6 +69,7 @@ type AIGeneratedQuizPayload struct {
 	Questions []struct {
 		DisplayOrder int    `json:"display_order"`
 		Category     string `json:"category"`
+		Difficulty   string `json:"difficulty"`
 		QuestionText string `json:"question_text"`
 		Options      struct {
 			A string `json:"A"`
@@ -95,9 +96,9 @@ func (s *service) GenerateDailyQuiz(ctx context.Context, customDate string) (*qu
 
 	prompt := fmt.Sprintf(`Generate a 3-question competitive exam daily current affairs & General Knowledge (GK) quiz for date %s.
 Question Distribution:
-- Question 1 (display_order 1): Category must be "National Current Affairs". Focus on national governance, Union policy, infrastructure, Supreme Court rulings, or major national achievements.
-- Question 2 (display_order 2): Category must be "International & World News". Focus on global summits, international organizations, foreign policy, or major world affairs.
-- Question 3 (display_order 3): Category must be one topic such as "General Knowledge (GK)", "Science & Tech", "Sports & Awards", "Economy", or "History & Polity".
+- Question 1 (display_order 1): difficulty must be "simple". Category must be "National Current Affairs". Focus on national governance, Union policy, infrastructure, Supreme Court rulings, or major national achievements.
+- Question 2 (display_order 2): difficulty must be "medium". Category must be "International & World News". Focus on global summits, international organizations, foreign policy, or major world affairs.
+- Question 3 (display_order 3): difficulty must be "hard". Category must be one topic such as "General Knowledge (GK)", "Science & Tech", "Sports & Awards", "Economy", or "History & Polity".
 
 Requirements:
 - Provide exactly 4 options (A, B, C, D) for each question.
@@ -114,6 +115,7 @@ Return JSON in this EXACT structure:
     {
       "display_order": 1,
       "category": "National Current Affairs",
+      "difficulty": "simple",
       "question_text": "...",
       "options": { "A": "...", "B": "...", "C": "...", "D": "..." },
       "correct_option": "A",
@@ -155,6 +157,13 @@ Return JSON in this EXACT structure:
 
 	for _, q := range aiPayload.Questions {
 		srcDate := q.SourceDate
+		difficulty := quiz.DifficultyMedium
+		switch q.DisplayOrder {
+		case 1:
+			difficulty = quiz.DifficultySimple
+		case 3:
+			difficulty = quiz.DifficultyHard
+		}
 		createReq.Questions = append(createReq.Questions, quiz.CreateQuestionDTO{
 			QuestionText:  q.QuestionText,
 			OptionA:       q.Options.A,
@@ -164,6 +173,7 @@ Return JSON in this EXACT structure:
 			CorrectOption: strings.ToUpper(strings.TrimSpace(q.CorrectOption)),
 			Explanation:   q.Explanation,
 			Category:      q.Category,
+			Difficulty:    difficulty,
 			SourceName:    q.SourceName,
 			SourceURL:     q.SourceURL,
 			SourceDate:    &srcDate,
@@ -290,6 +300,7 @@ func (s *service) generateMockFallbackJSON() string {
     {
       "display_order": 1,
       "category": "National Current Affairs",
+      "difficulty": "simple",
       "question_text": "Which initiative was approved by the Union Cabinet of India with a budget of ₹2,000 crore to enhance weather observation, radar networks, and AI forecasting?",
       "options": {
         "A": "Mission Mausam",
@@ -306,6 +317,7 @@ func (s *service) generateMockFallbackJSON() string {
     {
       "display_order": 2,
       "category": "International & World News",
+      "difficulty": "medium",
       "question_text": "Which landmark international agreement was formally adopted at the UN Summit of the Future during the 79th General Assembly?",
       "options": {
         "A": "Pact for the Future",
@@ -322,6 +334,7 @@ func (s *service) generateMockFallbackJSON() string {
     {
       "display_order": 3,
       "category": "Science & Technology",
+      "difficulty": "hard",
       "question_text": "What is the primary target orbit location for ISRO's Chandrayaan-4 lunar sample return mission?",
       "options": {
         "A": "Lunar South Pole region",

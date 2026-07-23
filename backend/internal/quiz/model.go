@@ -19,35 +19,44 @@ const (
 	GeneratedByAI     GeneratedBy = "ai"
 )
 
+type Difficulty string
+
+const (
+	DifficultySimple Difficulty = "simple"
+	DifficultyMedium Difficulty = "medium"
+	DifficultyHard   Difficulty = "hard"
+)
+
 type Quiz struct {
-	ID          string     `json:"id"`
-	QuizDate    string     `json:"quiz_date"` // YYYY-MM-DD
-	Title       string     `json:"title"`
-	Status      QuizStatus `json:"status"`
-	GeneratedBy GeneratedBy`json:"generated_by"`
-	PublishedAt *time.Time `json:"published_at,omitempty"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
-	Questions   []Question `json:"questions,omitempty"`
+	ID          string      `json:"id"`
+	QuizDate    string      `json:"quiz_date"` // YYYY-MM-DD
+	Title       string      `json:"title"`
+	Status      QuizStatus  `json:"status"`
+	GeneratedBy GeneratedBy `json:"generated_by"`
+	PublishedAt *time.Time  `json:"published_at,omitempty"`
+	CreatedAt   time.Time   `json:"created_at"`
+	UpdatedAt   time.Time   `json:"updated_at"`
+	Questions   []Question  `json:"questions,omitempty"`
 }
 
 type Question struct {
-	ID            string    `json:"id"`
-	QuizID        string    `json:"quiz_id"`
-	QuestionText  string    `json:"question_text"`
-	OptionA       string    `json:"option_a"`
-	OptionB       string    `json:"option_b"`
-	OptionC       string    `json:"option_c"`
-	OptionD       string    `json:"option_d"`
-	CorrectOption string    `json:"correct_option,omitempty"` // Omitted in public GET quiz requests
-	Explanation   string    `json:"explanation,omitempty"`    // Omitted in public GET quiz requests
-	Category      string    `json:"category"`
-	SourceName    string    `json:"source_name"`
-	SourceURL     string    `json:"source_url"`
-	SourceDate    *string   `json:"source_date,omitempty"`
-	DisplayOrder  int       `json:"display_order"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	ID            string     `json:"id"`
+	QuizID        string     `json:"quiz_id"`
+	QuestionText  string     `json:"question_text"`
+	OptionA       string     `json:"option_a"`
+	OptionB       string     `json:"option_b"`
+	OptionC       string     `json:"option_c"`
+	OptionD       string     `json:"option_d"`
+	CorrectOption string     `json:"correct_option,omitempty"` // Omitted in public GET quiz requests
+	Explanation   string     `json:"explanation,omitempty"`    // Omitted in public GET quiz requests
+	Category      string     `json:"category"`
+	Difficulty    Difficulty `json:"difficulty"`
+	SourceName    string     `json:"source_name"`
+	SourceURL     string     `json:"source_url"`
+	SourceDate    *string    `json:"source_date,omitempty"`
+	DisplayOrder  int        `json:"display_order"`
+	CreatedAt     time.Time  `json:"created_at"`
+	UpdatedAt     time.Time  `json:"updated_at"`
 }
 
 // Public representations (where answers/explanations are concealed)
@@ -92,21 +101,22 @@ type QuizAttemptResult struct {
 }
 
 type DetailedAnswer struct {
-	QuestionID     string  `json:"question_id"`
-	QuestionText   string  `json:"question_text"`
-	OptionA        string  `json:"option_a"`
-	OptionB        string  `json:"option_b"`
-	OptionC        string  `json:"option_c"`
-	OptionD        string  `json:"option_d"`
-	SelectedOption string  `json:"selected_option"`
-	CorrectOption  string  `json:"correct_option"`
-	IsCorrect      bool    `json:"is_correct"`
-	Explanation    string  `json:"explanation"`
-	Category       string  `json:"category"`
-	SourceName     string  `json:"source_name"`
-	SourceURL      string  `json:"source_url"`
-	SourceDate     *string `json:"source_date,omitempty"`
-	DisplayOrder   int     `json:"display_order"`
+	QuestionID     string     `json:"question_id"`
+	QuestionText   string     `json:"question_text"`
+	OptionA        string     `json:"option_a"`
+	OptionB        string     `json:"option_b"`
+	OptionC        string     `json:"option_c"`
+	OptionD        string     `json:"option_d"`
+	SelectedOption string     `json:"selected_option"`
+	CorrectOption  string     `json:"correct_option"`
+	IsCorrect      bool       `json:"is_correct"`
+	Explanation    string     `json:"explanation"`
+	Category       string     `json:"category"`
+	Difficulty     Difficulty `json:"difficulty"`
+	SourceName     string     `json:"source_name"`
+	SourceURL      string     `json:"source_url"`
+	SourceDate     *string    `json:"source_date,omitempty"`
+	DisplayOrder   int        `json:"display_order"`
 }
 
 // Admin DTOs (3 questions minimum)
@@ -117,24 +127,25 @@ type CreateQuizRequest struct {
 }
 
 type CreateQuestionDTO struct {
-	QuestionText  string  `json:"question_text" binding:"required"`
-	OptionA       string  `json:"option_a" binding:"required"`
-	OptionB       string  `json:"option_b" binding:"required"`
-	OptionC       string  `json:"option_c" binding:"required"`
-	OptionD       string  `json:"option_d" binding:"required"`
-	CorrectOption string  `json:"correct_option" binding:"required,oneof=A B C D"`
-	Explanation   string  `json:"explanation" binding:"required"`
-	Category      string  `json:"category" binding:"required"`
-	SourceName    string  `json:"source_name" binding:"required"`
-	SourceURL     string  `json:"source_url" binding:"required"`
-	SourceDate    *string `json:"source_date"`
-	DisplayOrder  int     `json:"display_order" binding:"required,min=1"`
+	QuestionText  string     `json:"question_text" binding:"required"`
+	OptionA       string     `json:"option_a" binding:"required"`
+	OptionB       string     `json:"option_b" binding:"required"`
+	OptionC       string     `json:"option_c" binding:"required"`
+	OptionD       string     `json:"option_d" binding:"required"`
+	CorrectOption string     `json:"correct_option" binding:"required,oneof=A B C D"`
+	Explanation   string     `json:"explanation" binding:"required"`
+	Category      string     `json:"category" binding:"required"`
+	Difficulty    Difficulty `json:"difficulty" binding:"omitempty,oneof=simple medium hard"`
+	SourceName    string     `json:"source_name" binding:"required"`
+	SourceURL     string     `json:"source_url" binding:"required"`
+	SourceDate    *string    `json:"source_date"`
+	DisplayOrder  int        `json:"display_order" binding:"required,min=1"`
 }
 
 type AdminDashboardStats struct {
-	TodayQuizStatus string `json:"today_quiz_status"`
-	TotalPublished  int    `json:"total_published"`
-	TotalAttempts   int    `json:"total_attempts"`
-	AverageScore    float64`json:"average_score"`
-	RecentQuizzes   []Quiz `json:"recent_quizzes"`
+	TodayQuizStatus string  `json:"today_quiz_status"`
+	TotalPublished  int     `json:"total_published"`
+	TotalAttempts   int     `json:"total_attempts"`
+	AverageScore    float64 `json:"average_score"`
+	RecentQuizzes   []Quiz  `json:"recent_quizzes"`
 }

@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS questions (
     correct_option CHAR(1) NOT NULL,
     explanation TEXT NOT NULL,
     category VARCHAR(50) NOT NULL,
+    difficulty VARCHAR(10) NOT NULL DEFAULT 'medium',
     source_name VARCHAR(150) NOT NULL,
     source_url TEXT NOT NULL,
     source_date DATE,
@@ -44,6 +45,7 @@ CREATE TABLE IF NOT EXISTS questions (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT chk_correct_option CHECK (correct_option IN ('A', 'B', 'C', 'D')),
+    CONSTRAINT chk_question_difficulty CHECK (difficulty IN ('simple', 'medium', 'hard')),
     CONSTRAINT chk_display_order CHECK (display_order IN (1, 2, 3)),
     CONSTRAINT unq_quiz_display_order UNIQUE (quiz_id, display_order)
 );

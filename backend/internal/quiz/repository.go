@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+var ErrQuizDateAlreadyExists = errors.New("quiz already exists for this date")
 
 type Repository interface {
 	GetTodayPublishedQuiz(ctx context.Context) (*Quiz, error)
@@ -118,7 +121,7 @@ func (r *repository) GetQuizByID(ctx context.Context, id string) (*Quiz, error) 
 func (r *repository) getQuestionsByQuizID(ctx context.Context, quizID string, includeAnswers bool) ([]Question, error) {
 	query := `
 		SELECT id, quiz_id, question_text, option_a, option_b, option_c, option_d,
-		       correct_option, explanation, category, source_name, source_url, source_date, display_order, created_at, updated_at
+		       correct_option, explanation, category, difficulty, source_name, source_url, source_date, display_order, created_at, updated_at
 		FROM questions
 		WHERE quiz_id = $1
 		ORDER BY display_order ASC
@@ -135,7 +138,7 @@ func (r *repository) getQuestionsByQuizID(ctx context.Context, quizID string, in
 		var srcDate sql.NullTime
 		err := rows.Scan(
 			&q.ID, &q.QuizID, &q.QuestionText, &q.OptionA, &q.OptionB, &q.OptionC, &q.OptionD,
-			&q.CorrectOption, &q.Explanation, &q.Category, &q.SourceName, &q.SourceURL, &srcDate, &q.DisplayOrder, &q.CreatedAt, &q.UpdatedAt,
+			&q.CorrectOption, &q.Explanation, &q.Category, &q.Difficulty, &q.SourceName, &q.SourceURL, &srcDate, &q.DisplayOrder, &q.CreatedAt, &q.UpdatedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed scanning question: %w", err)
@@ -264,14 +267,20 @@ func (r *repository) CreateQuiz(ctx context.Context, quiz *Quiz) error {
 		&quiz.ID, &quiz.CreatedAt, &quiz.UpdatedAt,
 	)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) &&
+			pgErr.Code == "23505" &&
+			pgErr.ConstraintName == "quizzes_quiz_date_key" {
+			return fmt.Errorf("%w: %s", ErrQuizDateAlreadyExists, quiz.QuizDate)
+		}
 		return fmt.Errorf("failed to insert quiz: %w", err)
 	}
 
 	questionQuery := `
 		INSERT INTO questions (
 			quiz_id, question_text, option_a, option_b, option_c, option_d,
-			correct_option, explanation, category, source_name, source_url, source_date, display_order, created_at, updated_at
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
+			correct_option, explanation, category, difficulty, source_name, source_url, source_date, display_order, created_at, updated_at
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), NOW())
 		RETURNING id, created_at, updated_at
 	`
 
@@ -288,7 +297,7 @@ func (r *repository) CreateQuiz(ctx context.Context, quiz *Quiz) error {
 
 		err = tx.QueryRow(ctx, questionQuery,
 			q.QuizID, q.QuestionText, q.OptionA, q.OptionB, q.OptionC, q.OptionD,
-			q.CorrectOption, q.Explanation, q.Category, q.SourceName, q.SourceURL, srcDate, q.DisplayOrder,
+			q.CorrectOption, q.Explanation, q.Category, q.Difficulty, q.SourceName, q.SourceURL, srcDate, q.DisplayOrder,
 		).Scan(&q.ID, &q.CreatedAt, &q.UpdatedAt)
 		if err != nil {
 			return fmt.Errorf("failed inserting question %d: %w", q.DisplayOrder, err)
@@ -324,8 +333,8 @@ func (r *repository) UpdateQuiz(ctx context.Context, quiz *Quiz) error {
 	questionQuery := `
 		INSERT INTO questions (
 			quiz_id, question_text, option_a, option_b, option_c, option_d,
-			correct_option, explanation, category, source_name, source_url, source_date, display_order, created_at, updated_at
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
+			correct_option, explanation, category, difficulty, source_name, source_url, source_date, display_order, created_at, updated_at
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), NOW())
 		RETURNING id, created_at, updated_at
 	`
 
@@ -342,7 +351,7 @@ func (r *repository) UpdateQuiz(ctx context.Context, quiz *Quiz) error {
 
 		err = tx.QueryRow(ctx, questionQuery,
 			q.QuizID, q.QuestionText, q.OptionA, q.OptionB, q.OptionC, q.OptionD,
-			q.CorrectOption, q.Explanation, q.Category, q.SourceName, q.SourceURL, srcDate, q.DisplayOrder,
+			q.CorrectOption, q.Explanation, q.Category, q.Difficulty, q.SourceName, q.SourceURL, srcDate, q.DisplayOrder,
 		).Scan(&q.ID, &q.CreatedAt, &q.UpdatedAt)
 		if err != nil {
 			return fmt.Errorf("failed inserting question %d: %w", q.DisplayOrder, err)
@@ -439,7 +448,7 @@ func (r *repository) GetAttemptResult(ctx context.Context, attemptID string) (*Q
 	answersQuery := `
 		SELECT q.id, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
 		       ans.selected_option, q.correct_option, ans.is_correct, q.explanation,
-			   q.category, q.source_name, q.source_url, q.source_date, q.display_order
+			   q.category, q.difficulty, q.source_name, q.source_url, q.source_date, q.display_order
 		FROM attempt_answers ans
 		JOIN questions q ON ans.question_id = q.id
 		WHERE ans.attempt_id = $1
@@ -457,7 +466,7 @@ func (r *repository) GetAttemptResult(ctx context.Context, attemptID string) (*Q
 		err := rows.Scan(
 			&da.QuestionID, &da.QuestionText, &da.OptionA, &da.OptionB, &da.OptionC, &da.OptionD,
 			&da.SelectedOption, &da.CorrectOption, &da.IsCorrect, &da.Explanation,
-			&da.Category, &da.SourceName, &da.SourceURL, &srcDate, &da.DisplayOrder,
+			&da.Category, &da.Difficulty, &da.SourceName, &da.SourceURL, &srcDate, &da.DisplayOrder,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed scanning detailed answer: %w", err)

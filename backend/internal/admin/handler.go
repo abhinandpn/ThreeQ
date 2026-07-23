@@ -1,6 +1,9 @@
 package admin
 
 import (
+	"errors"
+	"log"
+	"net/http"
 	"strconv"
 
 	"quiz-keralam-backend/internal/auth"
@@ -163,7 +166,18 @@ func (h *Handler) GenerateQuiz(c *gin.Context) {
 
 	generated, err := h.genSvc.GenerateDailyQuiz(c.Request.Context(), req.Date)
 	if err != nil {
-		response.InternalServerError(c, "Generation failed: "+err.Error())
+		log.Printf("quiz generation failed for date %q: %v", req.Date, err)
+		if errors.Is(err, quiz.ErrQuizDateAlreadyExists) {
+			response.Error(
+				c,
+				http.StatusConflict,
+				"A quiz already exists for this date. Open Quizzes List to review, edit, approve, or publish the existing quiz.",
+				"QUIZ_ALREADY_EXISTS",
+				gin.H{"date": req.Date},
+			)
+			return
+		}
+		response.InternalServerError(c, "Quiz generation could not be completed. Please try again. If the problem continues, check Analytics & Logs.")
 		return
 	}
 

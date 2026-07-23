@@ -173,6 +173,7 @@ func (s *service) CreateQuiz(ctx context.Context, req CreateQuizRequest) (*Quiz,
 		if displayOrder < 1 {
 			displayOrder = i + 1
 		}
+		difficulty := normalizeDifficulty(qDto.Difficulty)
 		questions[i] = Question{
 			QuestionText:  qDto.QuestionText,
 			OptionA:       qDto.OptionA,
@@ -182,6 +183,7 @@ func (s *service) CreateQuiz(ctx context.Context, req CreateQuizRequest) (*Quiz,
 			CorrectOption: qDto.CorrectOption,
 			Explanation:   qDto.Explanation,
 			Category:      qDto.Category,
+			Difficulty:    difficulty,
 			SourceName:    qDto.SourceName,
 			SourceURL:     qDto.SourceURL,
 			SourceDate:    qDto.SourceDate,
@@ -216,6 +218,7 @@ func (s *service) UpdateQuiz(ctx context.Context, id string, req CreateQuizReque
 		if displayOrder < 1 {
 			displayOrder = i + 1
 		}
+		difficulty := normalizeDifficulty(qDto.Difficulty)
 		questions[i] = Question{
 			QuizID:        id,
 			QuestionText:  qDto.QuestionText,
@@ -226,6 +229,7 @@ func (s *service) UpdateQuiz(ctx context.Context, id string, req CreateQuizReque
 			CorrectOption: qDto.CorrectOption,
 			Explanation:   qDto.Explanation,
 			Category:      qDto.Category,
+			Difficulty:    difficulty,
 			SourceName:    qDto.SourceName,
 			SourceURL:     qDto.SourceURL,
 			SourceDate:    qDto.SourceDate,
@@ -239,6 +243,15 @@ func (s *service) UpdateQuiz(ctx context.Context, id string, req CreateQuizReque
 	}
 
 	return existing, nil
+}
+
+func normalizeDifficulty(difficulty Difficulty) Difficulty {
+	switch difficulty {
+	case DifficultySimple, DifficultyMedium, DifficultyHard:
+		return difficulty
+	default:
+		return DifficultyMedium
+	}
 }
 
 func (s *service) DeleteDraftQuiz(ctx context.Context, id string) error {
