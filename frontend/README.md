@@ -1,29 +1,47 @@
-# Quiz Keralam - Next.js Frontend
+# ThreeQ Frontend (Pure HTML5, CSS3, Vanilla JS)
 
-Responsive web application for Quiz Keralam ("3 Questions. 1 Minute. Every Day."), built using Next.js (App Router), TypeScript, Tailwind CSS, Lucide React, and Framer Motion.
+Pure lightweight static frontend for **ThreeQ** (3 Questions. 1 Minute. Every Day). Built with zero node dependencies or framework compilers.
 
-## Features
-- **Mobile-First Responsive Design**: Optimized for seamless daily quiz experience across mobile and desktop devices.
-- **Guest Quiz Submission**: Answer 3 daily questions without an account, store draft answers in `localStorage`.
-- **Kerala Design System**: Visual aesthetic featuring Deep Emerald Green, Warm Saffron Orange, Golden Yellow, and custom SVG background accents.
-- **WhatsApp Integration**: Single-tap WhatsApp share button with URL-encoded score card template.
-- **Admin Dashboard & Editor**: Management interface for draft generation, review, manual editing, approval, and live publication.
-- **Static Export Compatible**: Configured for Cloudflare Pages static export (`output: 'export'`).
+## 📁 File Structure
 
-## Local Setup
-
-```bash
-# 1. Navigate to frontend directory
-cd frontend
-
-# 2. Copy environment variables file
-cp .env.example .env.local
-
-# 3. Install dependencies
-npm install
-
-# 4. Start Next.js development server
-npm run dev
+```
+frontend/
+├── index.html               # Home / Landing page
+├── quiz.html                # Today's Quiz / Stepper page
+├── quiz-date.html           # Quiz by Date page
+├── result.html              # Quiz Result & Explanations page
+├── archive.html             # Previous Quizzes Archive page
+├── leaderboard.html         # Leaderboard page
+├── profile.html             # Profile page
+├── settings.html            # Settings page
+├── about.html               # About page
+├── 404.html                 # 404 Page
+├── admin-login.html         # Admin Login page
+├── admin-dashboard.html     # Admin Dashboard page
+├── admin-quizzes.html       # Admin Quizzes List page
+├── admin-quiz-new.html      # Admin Manual Quiz Creator page
+├── admin-quiz-edit.html     # Admin Quiz Review & Editor page
+├── admin-stats.html        # Admin Analytics & System Logs page
+├── css/
+│   └── styles.css           # Complete vanilla CSS design system
+├── js/
+│   ├── config.js            # API base URL configuration
+│   ├── storage.js           # LocalStorage state management
+│   ├── api.js               # Fetch API client (Go Backend)
+│   ├── confetti.js          # Canvas confetti script
+│   └── app.js               # Shared header/footer layout
+└── README.md
 ```
 
-Visit `http://localhost:3000` in your browser.
+## 🚀 How to Run Locally
+
+You can serve this pure HTML/CSS/JS frontend using **any static web server** or Python:
+
+```bash
+cd frontend
+python3 -m http.server 3000
+```
+
+Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+
+> Ensure your Go backend API is running on `http://localhost:8080` (`cd backend && go run ./cmd/api/main.go`).

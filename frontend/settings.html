@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - ThreeQ</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div id="header-root"></div>
+
+  <main class="main-content" style="max-width: 700px;">
+    <div style="margin-bottom: 2rem;">
+      <span class="badge badge-emerald" style="margin-bottom: 0.5rem;">⚙️ App Preferences</span>
+      <h1 style="font-size: 2.25rem; font-weight: 900; color: #fff;">Settings</h1>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">Configure your ThreeQ experience</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      <div class="glass-card" style="padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--emerald-light);">🌙</div>
+          <div>
+            <h4 style="font-weight: 800; color: #fff; font-size: 0.95rem;">Appearance Theme</h4>
+            <p style="font-size: 0.75rem; color: var(--text-secondary);">Dark Obsidian (Exclusive)</p>
+          </div>
+        </div>
+        <span class="badge badge-emerald">Dark Mode Only</span>
+      </div>
+
+      <div class="glass-card" style="padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--saffron-light);">🔔</div>
+          <div>
+            <h4 style="font-weight: 800; color: #fff; font-size: 0.95rem;">Daily Quiz Reminders</h4>
+            <p style="font-size: 0.75rem; color: var(--text-secondary);">Notify at 07:00 AM IST daily</p>
+          </div>
+        </div>
+        <span class="badge badge-emerald">Enabled</span>
+      </div>
+
+      <div class="glass-card" style="padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-color: rgba(239,68,68,0.3); margin-top: 1.5rem;">
+        <div>
+          <h4 style="font-weight: 800; color: #fca5a5; font-size: 0.95rem;">Clear Local Quiz Data</h4>
+          <p style="font-size: 0.75rem; color: var(--text-secondary);">Reset saved draft answers and guest ID</p>
+        </div>
+        <button type="button" class="btn btn-danger" id="btn-reset-data" style="font-size: 0.8rem; padding: 6px 14px;">🗑️ Reset Data</button>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      App.renderHeader('settings');
+      App.renderFooter();
+
+      document.getElementById('btn-reset-data').addEventListener('click', () => {
+        localStorage.clear();
+        const btn = document.getElementById('btn-reset-data');
+        btn.innerText = '✓ Cleared!';
+        setTimeout(() => btn.innerText = '🗑️ Reset Data', 3000);
+      });
+    });
+  </script>
+</body>
+</html>

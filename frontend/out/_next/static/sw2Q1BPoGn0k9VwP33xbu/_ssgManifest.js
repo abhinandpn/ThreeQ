@@ -1,1 +1,0 @@
-self.__SSG_MANIFEST=new Set(["\u002Fadmin\u002Fquizzes\u002F[id]","\u002Fquiz\u002F[date]","\u002Fresult\u002F[attemptId]"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()

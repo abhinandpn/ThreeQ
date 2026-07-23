@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics & System Logs - ThreeQ Admin</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div id="header-root"></div>
+
+  <main class="main-content" style="max-width: 1100px;">
+    <div class="admin-layout">
+      <!-- Admin Sidebar -->
+      <aside class="admin-sidebar">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2rem;">
+          <div class="logo-badge" style="width: 36px; height: 36px; font-size: 1rem;">A</div>
+          <div>
+            <h3 style="font-size: 1rem; font-weight: 900; color: #fff; line-height: 1;">Admin Portal</h3>
+            <span style="font-size: 0.65rem; font-weight: 700; color: var(--emerald-light); text-transform: uppercase;">ThreeQ Engine</span>
+          </div>
+        </div>
+
+        <nav style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 2rem;">
+          <a href="admin-dashboard.html" class="nav-link">📊 Dashboard</a>
+          <a href="admin-quizzes.html" class="nav-link">📋 Quizzes List</a>
+          <a href="admin-quiz-new.html" class="nav-link">➕ Create Quiz</a>
+          <a href="admin-stats.html" class="nav-link active">📈 Analytics & Logs</a>
+        </nav>
+      </aside>
+
+      <!-- Admin Main View -->
+      <section class="admin-main">
+        <div style="margin-bottom: 1.5rem;">
+          <span class="badge badge-emerald" style="margin-bottom: 0.25rem;">Analytics & Audit</span>
+          <h1 style="font-size: 1.75rem; font-weight: 900; color: #fff;">System Analytics & Logs</h1>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Monitor user attempts, score performance, and AI generation activity</p>
+        </div>
+
+        <!-- Metric Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+          <div class="glass-card" style="padding: 1.25rem;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Total Attempts</div>
+            <div style="font-size: 2rem; font-weight: 900; color: #fff; font-family: var(--font-mono);" id="stat-attempts">128</div>
+          </div>
+
+          <div class="glass-card" style="padding: 1.25rem;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Average Score</div>
+            <div style="font-size: 2rem; font-weight: 900; color: var(--emerald-light); font-family: var(--font-mono);" id="stat-avg">2.4 / 3</div>
+          </div>
+
+          <div class="glass-card" style="padding: 1.25rem;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Published Quizzes</div>
+            <div style="font-size: 2rem; font-weight: 900; color: var(--saffron-light); font-family: var(--font-mono);" id="stat-pub">15</div>
+          </div>
+        </div>
+
+        <!-- System Logs List -->
+        <div class="glass-card" style="padding: 1.5rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff;">AI & Editorial System Logs</h3>
+            <span class="badge badge-emerald">Live Feed</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div style="padding: 1rem; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--emerald-light); font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">✓</div>
+                <div>
+                  <p style="font-size: 0.85rem; font-weight: 700; color: #fff;">Gemini AI generated 3 questions draft</p>
+                  <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Date: 2026-07-24</span>
+                </div>
+              </div>
+              <span class="badge badge-emerald">Success</span>
+            </div>
+
+            <div style="padding: 1rem; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--emerald-light); font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">✓</div>
+                <div>
+                  <p style="font-size: 0.85rem; font-weight: 700; color: #fff;">Published daily quiz to live public feed</p>
+                  <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Date: 2026-07-23</span>
+                </div>
+              </div>
+              <span class="badge badge-emerald">Success</span>
+            </div>
+
+            <div style="padding: 1rem; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--emerald-light); font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">✓</div>
+                <div>
+                  <p style="font-size: 0.85rem; font-weight: 700; color: #fff;">Manual editorial review approved draft</p>
+                  <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Date: 2026-07-22</span>
+                </div>
+              </div>
+              <span class="badge badge-emerald">Success</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      App.renderHeader('');
+      App.renderFooter();
+
+      if (!Storage.getAdminToken()) {
+        window.location.href = 'admin-login.html';
+        return;
+      }
+
+      API.getAdminDashboard().then(stats => {
+        document.getElementById('stat-attempts').innerText = stats.total_attempts || 0;
+        document.getElementById('stat-pub').innerText = stats.total_published || 0;
+        document.getElementById('stat-avg').innerText = stats.average_score ? `${stats.average_score.toFixed(1)} / 3` : '0.0 / 3';
+      }).catch(console.error);
+    });
+  </script>
+</body>
+</html>

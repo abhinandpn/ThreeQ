@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Today's Quiz - ThreeQ</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div id="header-root"></div>
+
+  <main class="main-content" style="max-width: 700px;">
+    <!-- Title Header -->
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      <span class="badge badge-emerald" id="quiz-date-badge" style="margin-bottom: 0.5rem;">Daily Quiz</span>
+      <h1 style="font-size: 2rem; font-weight: 900; color: #fff;" id="quiz-title-heading">Today's Daily Quiz</h1>
+    </div>
+
+    <!-- Loading Container -->
+    <div id="loading-container" class="glass-card" style="text-align: center; padding: 3rem;">
+      <div style="color: var(--emerald-light); font-size: 1.5rem; margin-bottom: 0.5rem;">⚡</div>
+      <p style="color: var(--text-secondary); font-size: 0.9rem;">Fetching today's published quiz...</p>
+    </div>
+
+    <!-- Error Container -->
+    <div id="error-container" class="glass-card" style="display: none; text-align: center; border-color: rgba(239,68,68,0.3);">
+      <div style="font-size: 2rem; margin-bottom: 0.5rem;">📅</div>
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">Today's Quiz is Getting Ready</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;" id="error-message-text">Please check again soon or explore previous quizzes.</p>
+      <a href="archive.html" class="btn btn-emerald">Explore Quiz Archive →</a>
+    </div>
+
+    <!-- Stepper Quiz Card -->
+    <div id="quiz-card-container" class="glass-card" style="display: none;">
+      <!-- Progress Bar & Category -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+        <span class="badge badge-emerald" id="question-category">Category</span>
+        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
+          Question <span id="current-q-num" style="color: var(--emerald-light); font-weight: 900;">1</span> of 3
+        </span>
+      </div>
+
+      <div class="progress-container" style="margin-bottom: 1.5rem;">
+        <div class="progress-bar" id="progress-bar-fill" style="width: 33.3%;"></div>
+      </div>
+
+      <!-- Question Text -->
+      <h2 id="question-text" style="font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 1.5rem; line-height: 1.4;">
+        Question text...
+      </h2>
+
+      <!-- Options -->
+      <div id="options-list">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Controls -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.5rem; pt: 1rem; border-top: 1px solid var(--border-color);">
+        <button type="button" class="btn btn-glass" id="btn-prev" disabled>← Previous</button>
+        <button type="button" class="btn btn-emerald" id="btn-next" disabled>Next Question →</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Summary Modal -->
+  <div class="modal-overlay" id="summary-modal">
+    <div class="modal-card">
+      <div style="text-align: center; margin-bottom: 1.25rem;">
+        <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: var(--emerald-light); font-size: 1.4rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+          ✓
+        </div>
+        <h3 style="font-size: 1.35rem; font-weight: 900; color: #fff; margin-bottom: 0.25rem;">Ready to Submit?</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">Review your answers before submitting for official score calculation.</p>
+      </div>
+
+      <div id="summary-answers-list" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div id="submit-error" style="display: none; padding: 0.75rem; border-radius: 8px; background: rgba(239,68,68,0.15); color: #fca5a5; font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+        <button type="button" class="btn btn-glass" id="btn-modal-back">Back</button>
+        <button type="button" class="btn btn-saffron" id="btn-modal-submit">Submit Answers 🚀</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-root"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let currentQuiz = null;
+    let currentIndex = 0;
+    let selectedAnswers = {};
+    let isSubmitting = false;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      App.renderHeader('quiz');
+      App.renderFooter();
+
+      loadTodayQuiz();
+
+      document.getElementById('btn-next').addEventListener('click', handleNext);
+      document.getElementById('btn-prev').addEventListener('click', handlePrev);
+      document.getElementById('btn-modal-back').addEventListener('click', () => {
+        document.getElementById('summary-modal').classList.remove('open');
+      });
+      document.getElementById('btn-modal-submit').addEventListener('click', submitQuiz);
+    });
+
+    async function loadTodayQuiz() {
+      try {
+        currentQuiz = await API.getTodayQuiz();
+        document.getElementById('loading-container').style.display = 'none';
+
+        if (!currentQuiz || !currentQuiz.questions || currentQuiz.questions.length === 0) {
+          showError("Today's quiz is getting ready. Please check again soon.");
+          return;
+        }
+
+        document.getElementById('quiz-date-badge').innerText = `Daily Quiz • ${currentQuiz.quiz_date}`;
+        document.getElementById('quiz-title-heading').innerText = currentQuiz.title;
+
+        // Restore draft answers from LocalStorage
+        const draft = Storage.getDraftAnswers(currentQuiz.id);
+        if (draft) selectedAnswers = draft;
+
+        document.getElementById('quiz-card-container').style.display = 'block';
+        renderQuestion();
+      } catch (err) {
+        console.error('Load today quiz error:', err);
+        document.getElementById('loading-container').style.display = 'none';
+        showError(err.message || "Today's quiz is getting ready. Please check again soon.");
+      }
+    }
+
+    function renderQuestion() {
+      const q = currentQuiz.questions[currentIndex];
+      document.getElementById('current-q-num').innerText = currentIndex + 1;
+      document.getElementById('question-category').innerText = q.category;
+      document.getElementById('question-text').innerText = q.question_text;
+
+      const progress = ((currentIndex + 1) / 3) * 100;
+      document.getElementById('progress-bar-fill').style.width = `${progress}%`;
+
+      const options = [
+        { label: 'A', text: q.option_a },
+        { label: 'B', text: q.option_b },
+        { label: 'C', text: q.option_c },
+        { label: 'D', text: q.option_d },
+      ];
+
+      const currentSelected = selectedAnswers[q.id];
+      const listEl = document.getElementById('options-list');
+      listEl.innerHTML = options.map(opt => `
+        <button type="button" class="option-button ${currentSelected === opt.label ? 'selected' : ''}" onclick="selectOption('${q.id}', '${opt.label}')">
+          <div class="option-label">${opt.label}</div>
+          <div style="flex: 1; padding-top: 2px;">${opt.text}</div>
+        </button>
+      `).join('');
+
+      document.getElementById('btn-prev').disabled = currentIndex === 0;
+      const isCurrentAnswered = !!selectedAnswers[q.id];
+
+      const btnNext = document.getElementById('btn-next');
+      if (currentIndex === 2) {
+        btnNext.innerText = 'Review & Submit →';
+        btnNext.className = 'btn btn-saffron';
+        btnNext.disabled = !allQuestionsAnswered();
+      } else {
+        btnNext.innerText = 'Next Question →';
+        btnNext.className = 'btn btn-emerald';
+        btnNext.disabled = !isCurrentAnswered;
+      }
+    }
+
+    function selectOption(qId, label) {
+      selectedAnswers[qId] = label;
+      Storage.saveDraftAnswers(currentQuiz.id, selectedAnswers);
+      renderQuestion();
+    }
+
+    function allQuestionsAnswered() {
+      return currentQuiz && currentQuiz.questions.length === 3 && currentQuiz.questions.every(q => !!selectedAnswers[q.id]);
+    }
+
+    function handleNext() {
+      if (currentIndex < 2) {
+        currentIndex++;
+        renderQuestion();
+      } else if (allQuestionsAnswered()) {
+        showSummaryModal();
+      }
+    }
+
+    function handlePrev() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    }
+
+    function showSummaryModal() {
+      const listEl = document.getElementById('summary-answers-list');
+      listEl.innerHTML = currentQuiz.questions.map((q, idx) => `
+        <div style="padding: 0.85rem 1rem; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--emerald-light); text-transform: uppercase;">Q${idx + 1} • ${q.category}</span>
+            <p style="font-size: 0.85rem; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">${q.question_text}</p>
+          </div>
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--emerald-main); color: #fff; font-weight: 900; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">${selectedAnswers[q.id]}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('summary-modal').classList.add('open');
+    }
+
+    async function submitQuiz() {
+      if (isSubmitting) return;
+      isSubmitting = true;
+
+      const submitErrEl = document.getElementById('submit-error');
+      submitErrEl.style.display = 'none';
+
+      const guestId = Storage.getOrCreateGuestId();
+      const payload = {
+        guest_id: guestId,
+        answers: currentQuiz.questions.map(q => ({
+          question_id: q.id,
+          selected_option: selectedAnswers[q.id]
+        }))
+      };
+
+      try {
+        const result = await API.submitQuiz(currentQuiz.id, payload);
+        Storage.clearDraftAnswers(currentQuiz.id);
+        window.location.href = `result.html?id=${result.attempt_id}`;
+      } catch (err) {
+        console.error('Submit quiz error:', err);
+        submitErrEl.innerText = err.message || 'Failed to submit answers. Please try again.';
+        submitErrEl.style.display = 'block';
+        isSubmitting = false;
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById('error-message-text').innerText = msg;
+      document.getElementById('error-container').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - ThreeQ</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div id="header-root"></div>
+
+  <main class="main-content" style="max-width: 800px;">
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+      <span class="badge badge-emerald" style="margin-bottom: 0.5rem;">ℹ️ About ThreeQ</span>
+      <h1 style="font-size: 2.5rem; font-weight: 900; color: #fff;">3 Questions. 1 Minute. Every Day.</h1>
+      <p style="color: var(--text-secondary); font-size: 1rem; max-width: 550px; margin: 0.5rem auto 0;">
+        Empowering Kerala PSC aspirants and students with structured daily current affairs knowledge in less than 60 seconds.
+      </p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2.5rem;">
+      <div class="glass-card" style="display: flex; gap: 1.25rem;">
+        <div style="width: 48px; height: 48px; border-radius: 16px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--emerald-light); font-size: 1.3rem; display: flex; align-items: center; justify-content: center; shrink-0;">🎯</div>
+        <div>
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">Our Mission</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+            Traditional competitive exam prep is overwhelming. ThreeQ breaks current affairs down into digestible daily 3-question micro-quizzes, ensuring consistent retention without cognitive burnout.
+          </p>
+        </div>
+      </div>
+
+      <div class="glass-card" style="display: flex; gap: 1.25rem;">
+        <div style="width: 48px; height: 48px; border-radius: 16px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: var(--saffron-light); font-size: 1.3rem; display: flex; align-items: center; justify-content: center; shrink-0;">✨</div>
+        <div>
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">Daily Question Structure</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+            Every single day, exactly three multiple-choice questions are prepared following a strict exam-oriented distribution:
+          </p>
+          <ul style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.85rem; color: var(--text-primary); list-style: none;">
+            <li>✅ <strong>Question 1:</strong> Kerala Current Affairs (Governance, State Policy, Awards)</li>
+            <li>✅ <strong>Question 2:</strong> India National Current Affairs (Union Govt, Supreme Court, Economy)</li>
+            <li>✅ <strong>Question 3:</strong> Rotating Special Topic (Sports, Science & Tech, Environment, International)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="glass-card" style="display: flex; gap: 1.25rem;">
+        <div style="width: 48px; height: 48px; border-radius: 16px; background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.3); color: #22d3ee; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; shrink-0;">🛡️</div>
+        <div>
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">Accuracy & Editorial Review</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+            Questions are initially drafted using Gemini AI from reputable news sources (The Hindu, PIB, Press Trust of India). Before publication, every quiz undergoes manual editorial review by human administrators.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card glass-card-emerald" style="text-align: center; padding: 2.5rem;">
+      <h3 style="font-size: 1.5rem; font-weight: 900; color: #fff; margin-bottom: 0.5rem;">Ready to test your knowledge?</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Start today's 1-minute daily current affairs challenge now.</p>
+      <a href="quiz.html" class="btn btn-emerald">Start Today's Quiz →</a>
+    </div>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      App.renderHeader('about');
+      App.renderFooter();
+    });
+  </script>
+</body>
+</html>

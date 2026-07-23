@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Quiz - ThreeQ Admin</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div id="header-root"></div>
+
+  <main class="main-content" style="max-width: 1100px;">
+    <div class="admin-layout">
+      <!-- Admin Sidebar -->
+      <aside class="admin-sidebar">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2rem;">
+          <div class="logo-badge" style="width: 36px; height: 36px; font-size: 1rem;">A</div>
+          <div>
+            <h3 style="font-size: 1rem; font-weight: 900; color: #fff; line-height: 1;">Admin Portal</h3>
+            <span style="font-size: 0.65rem; font-weight: 700; color: var(--emerald-light); text-transform: uppercase;">ThreeQ Engine</span>
+          </div>
+        </div>
+
+        <nav style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 2rem;">
+          <a href="admin-dashboard.html" class="nav-link">📊 Dashboard</a>
+          <a href="admin-quizzes.html" class="nav-link">📋 Quizzes List</a>
+          <a href="admin-quiz-new.html" class="nav-link active">➕ Create Quiz</a>
+          <a href="admin-stats.html" class="nav-link">📈 Analytics & Logs</a>
+        </nav>
+      </aside>
+
+      <!-- Admin Main View -->
+      <section class="admin-main">
+        <div style="margin-bottom: 1.5rem;">
+          <span class="badge badge-emerald" style="margin-bottom: 0.25rem;">Editor</span>
+          <h1 style="font-size: 1.75rem; font-weight: 900; color: #fff;">Create Daily Quiz Manually</h1>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Draft a 3-question daily current affairs quiz</p>
+        </div>
+
+        <div id="form-error" style="display: none; padding: 0.75rem; border-radius: 8px; background: rgba(239,68,68,0.15); color: #fca5a5; font-size: 0.85rem; margin-bottom: 1.25rem; border: 1px solid rgba(239,68,68,0.3);"></div>
+
+        <form id="create-quiz-form">
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="form-group">
+              <label class="form-label">Quiz Date (YYYY-MM-DD)</label>
+              <input type="date" id="quiz_date" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quiz Title</label>
+              <input type="text" id="title" class="form-input" required placeholder="Daily Current Affairs - 24 July 2026">
+            </div>
+          </div>
+
+          <!-- 3 Questions Form -->
+          <div id="questions-forms-container" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+            <!-- Question 1, 2, 3 injected dynamically -->
+          </div>
+
+          <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <a href="admin-quizzes.html" class="btn btn-glass">Cancel</a>
+            <button type="submit" class="btn btn-emerald" id="btn-save-quiz">Save Draft Quiz →</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      App.renderHeader('');
+      App.renderFooter();
+
+      if (!Storage.getAdminToken()) {
+        window.location.href = 'admin-login.html';
+        return;
+      }
+
+      document.getElementById('quiz_date').value = App.getTodayDateString();
+      document.getElementById('title').value = `Daily Current Affairs - ${App.formatDateKolkata(App.getTodayDateString())}`;
+
+      renderQuestionInputs();
+
+      document.getElementById('create-quiz-form').addEventListener('submit', handleSaveQuiz);
+    });
+
+    function renderQuestionInputs() {
+      const categories = ['Kerala Current Affairs', 'India National Current Affairs', 'General Science & Tech'];
+      const container = document.getElementById('questions-forms-container');
+
+      container.innerHTML = [1, 2, 3].map(i => `
+        <div class="glass-card" style="padding: 1.5rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <span class="badge badge-emerald">Question ${i} of 3</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Category: ${categories[i-1]}</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <input type="text" id="q${i}_category" class="form-input" value="${categories[i-1]}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Question Text</label>
+            <textarea id="q${i}_text" class="form-textarea" rows="2" required placeholder="Enter clear multiple-choice question text..."></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+            <div class="form-group"><label class="form-label">Option A</label><input type="text" id="q${i}_opt_a" class="form-input" required></div>
+            <div class="form-group"><label class="form-label">Option B</label><input type="text" id="q${i}_opt_b" class="form-input" required></div>
+            <div class="form-group"><label class="form-label">Option C</label><input type="text" id="q${i}_opt_c" class="form-input" required></div>
+            <div class="form-group"><label class="form-label">Option D</label><input type="text" id="q${i}_opt_d" class="form-input" required></div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 0.75rem; margin-bottom: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Correct Option</label>
+              <select id="q${i}_correct" class="form-select" required>
+                <option value="A">Option A</option>
+                <option value="B">Option B</option>
+                <option value="C">Option C</option>
+                <option value="D">Option D</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Factual Explanation (&lt;80 words)</label>
+              <input type="text" id="q${i}_exp" class="form-input" required placeholder="Factual explanation for the correct answer...">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group"><label class="form-label">Source Name</label><input type="text" id="q${i}_src_name" class="form-input" value="The Hindu" required></div>
+            <div class="form-group"><label class="form-label">Source URL</label><input type="url" id="q${i}_src_url" class="form-input" value="https://thehindu.com" required></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function handleSaveQuiz(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('form-error');
+      const btn = document.getElementById('btn-save-quiz');
+      errEl.style.display = 'none';
+
+      const payload = {
+        quiz_date: document.getElementById('quiz_date').value,
+        title: document.getElementById('title').value,
+        questions: [1, 2, 3].map(i => ({
+          question_number: i,
+          category: document.getElementById(`q${i}_category`).value,
+          question_text: document.getElementById(`q${i}_text`).value,
+          option_a: document.getElementById(`q${i}_opt_a`).value,
+          option_b: document.getElementById(`q${i}_opt_b`).value,
+          option_c: document.getElementById(`q${i}_opt_c`).value,
+          option_d: document.getElementById(`q${i}_opt_d`).value,
+          correct_option: document.getElementById(`q${i}_correct`).value,
+          explanation: document.getElementById(`q${i}_exp`).value,
+          source_name: document.getElementById(`q${i}_src_name`).value,
+          source_url: document.getElementById(`q${i}_src_url`).value,
+        }))
+      };
+
+      btn.innerText = 'Saving...';
+      btn.disabled = true;
+
+      try {
+        const created = await API.createManualQuiz(payload);
+        window.location.href = `admin-quiz-edit.html?id=${created.id}`;
+      } catch (err) {
+        console.error('Save quiz failed:', err);
+        errEl.innerText = err.message || 'Failed to save quiz.';
+        errEl.style.display = 'block';
+        btn.innerText = 'Save Draft Quiz →';
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

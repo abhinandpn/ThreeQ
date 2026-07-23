@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile - ThreeQ</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div id="header-root"></div>
+
+  <main class="main-content" style="max-width: 800px;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, var(--emerald-main), var(--emerald-dark)); border: 1px solid rgba(52,211,153,0.3); font-size: 2rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; box-shadow: 0 0 25px var(--emerald-glow);">👤</div>
+      <span class="badge badge-emerald" style="margin-bottom: 0.5rem;">Guest Device Profile</span>
+      <h1 style="font-size: 2rem; font-weight: 900; color: #fff;" id="profile-guest-id">Guest User</h1>
+      <p style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 4px;">Stored locally in browser</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+      <div class="glass-card" style="text-align: center; padding: 1.25rem;">
+        <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🔥</div>
+        <div style="font-size: 1.5rem; font-weight: 900; color: #fff; font-family: var(--font-mono);">7 Days</div>
+        <span style="font-size: 0.75rem; color: var(--text-secondary);">Current Streak</span>
+      </div>
+
+      <div class="glass-card" style="text-align: center; padding: 1.25rem;">
+        <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">✅</div>
+        <div style="font-size: 1.5rem; font-weight: 900; color: #fff; font-family: var(--font-mono);">14</div>
+        <span style="font-size: 0.75rem; color: var(--text-secondary);">Quizzes Completed</span>
+      </div>
+
+      <div class="glass-card" style="text-align: center; padding: 1.25rem;">
+        <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🎓</div>
+        <div style="font-size: 1.5rem; font-weight: 900; color: var(--emerald-light); font-family: var(--font-mono);">88%</div>
+        <span style="font-size: 0.75rem; color: var(--text-secondary);">Accuracy Rate</span>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div>
+      <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 1rem;">Earned Achievements</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+        <div class="glass-card" style="padding: 1.25rem;">
+          <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔥</div>
+          <h4 style="font-weight: 800; color: #fff; font-size: 0.95rem; margin-bottom: 2px;">7-Day Streak</h4>
+          <p style="font-size: 0.75rem; color: var(--text-secondary);">Completed 7 daily quizzes in a row</p>
+        </div>
+
+        <div class="glass-card" style="padding: 1.25rem;">
+          <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎓</div>
+          <h4 style="font-weight: 800; color: #fff; font-size: 0.95rem; margin-bottom: 2px;">PSC Scholar</h4>
+          <p style="font-size: 0.75rem; color: var(--text-secondary);">Achieved 100% score on Kerala Affairs</p>
+        </div>
+
+        <div class="glass-card" style="padding: 1.25rem;">
+          <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚡</div>
+          <h4 style="font-weight: 800; color: #fff; font-size: 0.95rem; margin-bottom: 2px;">Speed Demon</h4>
+          <p style="font-size: 0.75rem; color: var(--text-secondary);">Completed quiz in under 30 seconds</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      App.renderHeader('profile');
+      App.renderFooter();
+
+      const guestId = Storage.getOrCreateGuestId();
+      document.getElementById('profile-guest-id').innerText = guestId;
+    });
+  </script>
+</body>
+</html>

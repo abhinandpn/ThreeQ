@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Quiz - ThreeQ Admin</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div id="header-root"></div>
+
+  <main class="main-content" style="max-width: 1100px;">
+    <div class="admin-layout">
+      <!-- Admin Sidebar -->
+      <aside class="admin-sidebar">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2rem;">
+          <div class="logo-badge" style="width: 36px; height: 36px; font-size: 1rem;">A</div>
+          <div>
+            <h3 style="font-size: 1rem; font-weight: 900; color: #fff; line-height: 1;">Admin Portal</h3>
+            <span style="font-size: 0.65rem; font-weight: 700; color: var(--emerald-light); text-transform: uppercase;">ThreeQ Engine</span>
+          </div>
+        </div>
+
+        <nav style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 2rem;">
+          <a href="admin-dashboard.html" class="nav-link">📊 Dashboard</a>
+          <a href="admin-quizzes.html" class="nav-link active">📋 Quizzes List</a>
+          <a href="admin-quiz-new.html" class="nav-link">➕ Create Quiz</a>
+          <a href="admin-stats.html" class="nav-link">📈 Analytics & Logs</a>
+        </nav>
+      </aside>
+
+      <!-- Admin Main View -->
+      <section class="admin-main">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.25rem;">
+              <span class="badge badge-emerald">Review & Edit</span>
+              <span id="quiz-status-badge"></span>
+            </div>
+            <h1 style="font-size: 1.75rem; font-weight: 900; color: #fff;" id="edit-title-heading">Quiz Editor</h1>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);" id="edit-date-sub">Quiz Date: ...</p>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem;" id="action-buttons-container">
+            <!-- Dynamic Approve / Publish / Unpublish Buttons -->
+          </div>
+        </div>
+
+        <div id="action-alert" style="display: none; padding: 0.75rem; border-radius: 8px; background: rgba(16,185,129,0.15); color: var(--emerald-light); font-size: 0.85rem; margin-bottom: 1.25rem; border: 1px solid rgba(16,185,129,0.3);"></div>
+
+        <div id="questions-edit-container" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+          <div style="padding: 2rem; text-align: center; color: var(--text-muted);">Loading quiz questions...</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let currentQuiz = null;
+    let quizId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      App.renderHeader('');
+      App.renderFooter();
+
+      if (!Storage.getAdminToken()) {
+        window.location.href = 'admin-login.html';
+        return;
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      quizId = urlParams.get('id');
+
+      if (!quizId) {
+        window.location.href = 'admin-quizzes.html';
+        return;
+      }
+
+      loadQuizDetails(quizId);
+    });
+
+    async function loadQuizDetails(id) {
+      try {
+        currentQuiz = await API.getAdminQuiz(id);
+        document.getElementById('edit-title-heading').innerText = currentQuiz.title;
+        document.getElementById('edit-date-sub').innerText = `Quiz Date: ${currentQuiz.quiz_date} • Source: ${currentQuiz.generated_by === 'ai' ? 'Gemini AI' : 'Manual'}`;
+
+        document.getElementById('quiz-status-badge').innerHTML = getStatusBadge(currentQuiz.status);
+        renderActionButtons(currentQuiz.status);
+        renderQuestions(currentQuiz.questions || []);
+      } catch (err) {
+        console.error('Load admin quiz error:', err);
+      }
+    }
+
+    function renderActionButtons(status) {
+      const container = document.getElementById('action-buttons-container');
+      const st = (status || '').toLowerCase();
+
+      if (st === 'published') {
+        container.innerHTML = `
+          <a href="quiz-date.html?date=${currentQuiz.quiz_date}" target="_blank" class="btn btn-glass" style="font-size: 0.8rem; padding: 6px 12px;">👁️ Live Preview</a>
+          <button type="button" class="btn btn-danger" onclick="handleUnpublish()" style="font-size: 0.8rem; padding: 6px 12px;">Unpublish</button>
+        `;
+      } else if (st === 'approved') {
+        container.innerHTML = `
+          <button type="button" class="btn btn-emerald" onclick="handlePublish()" style="font-size: 0.8rem; padding: 6px 12px;">🚀 Publish Live</button>
+        `;
+      } else {
+        container.innerHTML = `
+          <button type="button" class="btn btn-saffron" onclick="handleApprove()" style="font-size: 0.8rem; padding: 6px 12px;">✓ Approve Draft</button>
+          <button type="button" class="btn btn-emerald" onclick="handlePublish()" style="font-size: 0.8rem; padding: 6px 12px;">🚀 Publish Live</button>
+        `;
+      }
+    }
+
+    function renderQuestions(questions) {
+      const container = document.getElementById('questions-edit-container');
+      container.innerHTML = questions.map((q, idx) => `
+        <div class="glass-card" style="padding: 1.5rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <span class="badge badge-emerald">Question ${idx + 1} of 3</span>
+            <span class="badge badge-slate">${q.category}</span>
+          </div>
+
+          <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 1rem; line-height: 1.4;">${q.question_text}</h3>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+            <div style="padding: 0.75rem; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); ${q.correct_option === 'A' ? 'border-color: var(--emerald-main); color: #fff;' : 'color: var(--text-secondary);'} font-size: 0.85rem;">
+              <strong>A:</strong> ${q.option_a} ${q.correct_option === 'A' ? '✓' : ''}
+            </div>
+            <div style="padding: 0.75rem; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); ${q.correct_option === 'B' ? 'border-color: var(--emerald-main); color: #fff;' : 'color: var(--text-secondary);'} font-size: 0.85rem;">
+              <strong>B:</strong> ${q.option_b} ${q.correct_option === 'B' ? '✓' : ''}
+            </div>
+            <div style="padding: 0.75rem; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); ${q.correct_option === 'C' ? 'border-color: var(--emerald-main); color: #fff;' : 'color: var(--text-secondary);'} font-size: 0.85rem;">
+              <strong>C:</strong> ${q.option_c} ${q.correct_option === 'C' ? '✓' : ''}
+            </div>
+            <div style="padding: 0.75rem; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); ${q.correct_option === 'D' ? 'border-color: var(--emerald-main); color: #fff;' : 'color: var(--text-secondary);'} font-size: 0.85rem;">
+              <strong>D:</strong> ${q.option_d} ${q.correct_option === 'D' ? '✓' : ''}
+            </div>
+          </div>
+
+          <div style="padding: 0.85rem; border-radius: 8px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); font-size: 0.85rem; color: var(--saffron-light); margin-bottom: 0.75rem;">
+            <strong>Factual Explanation:</strong> ${q.explanation}
+          </div>
+
+          <div style="font-size: 0.75rem; color: var(--text-muted);">
+            Verified Source: <a href="${q.source_url}" target="_blank" style="color: var(--emerald-light); font-weight: 700;">${q.source_name} ↗</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function handleApprove() {
+      try {
+        await API.approveQuiz(quizId);
+        showAlert('Quiz approved successfully!');
+        loadQuizDetails(quizId);
+      } catch (err) {
+        alert(err.message || 'Failed to approve quiz.');
+      }
+    }
+
+    async function handlePublish() {
+      try {
+        await API.publishQuiz(quizId);
+        showAlert('Quiz published live to public users!');
+        loadQuizDetails(quizId);
+      } catch (err) {
+        alert(err.message || 'Failed to publish quiz.');
+      }
+    }
+
+    async function handleUnpublish() {
+      try {
+        await API.unpublishQuiz(quizId);
+        showAlert('Quiz unpublished back to draft mode.');
+        loadQuizDetails(quizId);
+      } catch (err) {
+        alert(err.message || 'Failed to unpublish quiz.');
+      }
+    }
+
+    function showAlert(msg) {
+      const el = document.getElementById('action-alert');
+      el.innerText = msg;
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 4000);
+    }
+
+    function getStatusBadge(status) {
+      switch ((status || '').toLowerCase()) {
+        case 'published':
+          return `<span class="badge badge-emerald">🌐 Published</span>`;
+        case 'approved':
+          return `<span class="badge badge-saffron">✓ Approved</span>`;
+        case 'draft':
+        default:
+          return `<span class="badge badge-slate">⏱️ Draft</span>`;
+      }
+    }
+  </script>
+</body>
+</html>

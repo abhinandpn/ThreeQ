@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThreeQ - 3 Questions. 1 Minute. Every Day.</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div id="header-root"></div>
+
+  <main class="main-content">
+    <!-- Hero Section -->
+    <div class="glass-card glass-card-emerald" style="margin-bottom: 2rem; position: relative;">
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem;">
+        <span class="badge badge-emerald">🔥 3 Questions • 1 Minute Daily</span>
+        <span class="badge badge-slate">📍 Kerala & India Current Affairs</span>
+      </div>
+
+      <h1 style="font-size: 2.5rem; font-weight: 900; line-height: 1.15; margin-bottom: 1rem; color: #fff; letter-spacing: -0.02em;">
+        Three questions. <br>
+        <span style="color: var(--emerald-light); text-shadow: 0 0 20px var(--emerald-glow);">One minute.</span> Smarter every day.
+      </h1>
+
+      <p style="color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 2rem; max-width: 600px; line-height: 1.6;">
+        Test your knowledge with today’s fast 3-question current affairs micro-quiz. Tailored for Kerala PSC aspirants, competitive exams, and daily habit-building.
+      </p>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+        <a href="quiz.html" class="btn btn-emerald" id="hero-today-cta">
+          <span>Start Today's Quiz</span> →
+        </a>
+        <a href="archive.html" class="btn btn-glass">
+          <span>View Quiz Archive</span>
+        </a>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-secondary);">
+        <div>✅ 3 Fact-Checked Questions</div>
+        <div>⏱️ Instant Factual Explanations</div>
+        <div>💬 WhatsApp Group Share</div>
+      </div>
+    </div>
+
+    <!-- Habit Streak Banner -->
+    <div class="glass-card glass-card-saffron" style="padding: 1.25rem 1.75rem; margin-bottom: 2.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--saffron-main), var(--saffron-dark)); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #fff; box-shadow: 0 0 20px var(--saffron-glow);">
+          🔥
+        </div>
+        <div>
+          <h3 style="font-weight: 800; color: #fff; font-size: 1.05rem;">Build Your Daily 1-Minute Habit</h3>
+          <p style="color: var(--text-secondary); font-size: 0.85rem;">3 questions a day = 90+ verified current-affairs facts learned every month!</p>
+        </div>
+      </div>
+      <a href="quiz.html" class="btn btn-saffron" style="padding: 8px 18px; font-size: 0.85rem;">
+        Take Quiz Now →
+      </a>
+    </div>
+
+    <!-- 3 Core Feature Highlights -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+      <div class="glass-card glass-card-interactive">
+        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 1rem;">
+          🎯
+        </div>
+        <h3 style="font-weight: 800; color: #fff; font-size: 1.1rem; margin-bottom: 0.5rem;">3 Daily Questions</h3>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6;">
+          Curated daily: Q1 on Kerala Current Affairs, Q2 on India Affairs, and Q3 on Science, Sports, or Economy.
+        </p>
+      </div>
+
+      <div class="glass-card glass-card-interactive">
+        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 1rem;">
+          💡
+        </div>
+        <h3 style="font-weight: 800; color: #fff; font-size: 1.1rem; margin-bottom: 0.5rem;">Instant Explanations</h3>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6;">
+          Every question features factual explanations under 80 words linked to verified news source citations.
+        </p>
+      </div>
+
+      <div class="glass-card glass-card-interactive">
+        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 1rem;">
+          📲
+        </div>
+        <h3 style="font-weight: 800; color: #fff; font-size: 1.1rem; margin-bottom: 0.5rem;">WhatsApp Group Share</h3>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6;">
+          Share your score with study groups and WhatsApp friends instantly with a single tap after completing.
+        </p>
+      </div>
+    </div>
+
+    <!-- Recent Quizzes List -->
+    <div class="glass-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+        <div>
+          <h2 style="font-weight: 900; color: #fff; font-size: 1.25rem;">Recent Daily Quizzes</h2>
+          <p style="color: var(--text-secondary); font-size: 0.85rem;">Catch up on quizzes you missed from previous days</p>
+        </div>
+        <a href="archive.html" style="color: var(--emerald-light); font-weight: 700; font-size: 0.85rem;">View All →</a>
+      </div>
+
+      <div id="recent-quizzes-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading daily quizzes...</div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      App.renderHeader('home');
+      App.renderFooter();
+
+      const todayStr = App.getTodayDateString();
+      const heroCta = document.getElementById('hero-today-cta');
+      if (heroCta) {
+        heroCta.innerHTML = `<span>Start Today's Quiz (${App.formatDateKolkata(todayStr)})</span> →`;
+      }
+
+      // Load Recent Quizzes from Backend API
+      API.getPublishedQuizzes(1, 5)
+        .then(res => {
+          const list = document.getElementById('recent-quizzes-list');
+          if (!list) return;
+
+          const quizzes = res.quizzes || [];
+          if (quizzes.length === 0) {
+            list.innerHTML = `<div style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No published quizzes found yet. Check back soon!</div>`;
+            return;
+          }
+
+          list.innerHTML = quizzes.map(q => `
+            <a href="quiz-date.html?date=${q.quiz_date}" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-radius: var(--radius-lg); background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); transition: all 0.2s;" onmouseover="this.style.borderColor='var(--border-glow-emerald)'; this.style.background='rgba(255,255,255,0.06)';" onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='rgba(255,255,255,0.03)';">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--emerald-light); font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">📅</div>
+                <div>
+                  <h4 style="font-weight: 700; color: #fff; font-size: 0.95rem; margin-bottom: 2px;">${q.title}</h4>
+                  <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 500;">${App.formatDateKolkata(q.quiz_date)}</span>
+                </div>
+              </div>
+              <span style="font-size: 0.8rem; font-weight: 700; color: var(--emerald-light);">Attempt Quiz →</span>
+            </a>
+          `).join('');
+        })
+        .catch(err => {
+          console.error('Failed fetching quizzes:', err);
+          const list = document.getElementById('recent-quizzes-list');
+          if (list) {
+            list.innerHTML = `<div style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Backend connecting... Start backend API on port 8080.</div>`;
+          }
+        });
+    });
+  </script>
+</body>
+</html>
