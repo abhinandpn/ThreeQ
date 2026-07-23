@@ -35,7 +35,7 @@ func main() {
 	// Initialize Postgres Connection Pool
 	pool, err := database.NewPool(ctx, cfg.DatabaseURL)
 	if err != nil {
-		log.Printf("[WARNING] Could not connect to database pool: %v. Running in standalone mode if needed.", err)
+		log.Printf("[WARNING] Could not connect to database pool: %v. Running in standalone in-memory mode.", err)
 	} else {
 		defer pool.Close()
 	}
@@ -44,14 +44,15 @@ func main() {
 	var quizRepo quiz.Repository
 	if pool != nil {
 		quizRepo = quiz.NewRepository(pool)
+	} else {
+		quizRepo = quiz.NewMemoryRepository()
 	}
 	
 	quizSvc := quiz.NewService(quizRepo)
-
-	var authSvc auth.Service
+	authSvc := auth.NewService(pool, cfg)
+	
+	// Seed default admin user asynchronously on startup if pool exists
 	if pool != nil {
-		authSvc = auth.NewService(pool, cfg)
-		// Seed default admin user asynchronously on startup
 		go func() {
 			seedCtx, seedCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer seedCancel()
@@ -61,10 +62,7 @@ func main() {
 		}()
 	}
 
-	var genSvc generation.Service
-	if pool != nil {
-		genSvc = generation.NewService(pool, cfg, quizSvc)
-	}
+	genSvc := generation.NewService(pool, cfg, quizSvc)
 
 	// Handlers
 	quizHandler := quiz.NewHandler(quizSvc)
@@ -82,8 +80,12 @@ func main() {
 	{
 		// Health Check
 		v1.GET("/health", func(c *gin.Context) {
+			status := "UP"
+			if pool == nil {
+				status = "STANDALONE_MEMORY"
+			}
 			response.OK(c, "Quiz Keralam Backend is healthy", gin.H{
-				"status":    "UP",
+				"status":    status,
 				"timestamp": time.Now().Format(time.RFC3339),
 				"env":       cfg.AppEnv,
 			})
@@ -102,31 +104,24 @@ func main() {
 			adminAuthGroup.POST("/login", adminHandler.Login)
 		}
 
-		// Protected Admin Routes (JWT Auth required)
-		adminProtected := v1.Group("/admin")
-		adminProtected.Use(middleware.AdminAuth(cfg))
+		// Admin Protected Group
+		adminGroup := v1.Group("/admin")
+		adminGroup.Use(middleware.AdminAuth(cfg))
 		{
-			adminProtected.GET("/dashboard", adminHandler.GetDashboard)
-			adminProtected.GET("/quizzes", adminHandler.ListQuizzes)
-			adminProtected.POST("/quizzes", adminHandler.CreateQuiz)
-			adminProtected.GET("/quizzes/:id", adminHandler.GetQuiz)
-			adminProtected.PUT("/quizzes/:id", adminHandler.UpdateQuiz)
-			adminProtected.DELETE("/quizzes/:id", adminHandler.DeleteQuiz)
-			adminProtected.POST("/quizzes/:id/approve", adminHandler.ApproveQuiz)
-			adminProtected.POST("/quizzes/:id/publish", adminHandler.PublishQuiz)
-			adminProtected.POST("/quizzes/:id/unpublish", adminHandler.UnpublishQuiz)
-		}
-
-		// Protected Generation Endpoint (Accessible via GitHub Actions Cron Key or Admin JWT)
-		genGroup := v1.Group("/admin/quizzes")
-		genGroup.Use(middleware.RequireCronKeyOrAdmin(cfg))
-		{
-			genGroup.POST("/generate", adminHandler.GenerateQuiz)
+			adminGroup.GET("/dashboard", adminHandler.GetDashboard)
+			adminGroup.GET("/quizzes", adminHandler.ListQuizzes)
+			adminGroup.POST("/quizzes", adminHandler.CreateQuiz)
+			adminGroup.GET("/quizzes/:id", adminHandler.GetQuiz)
+			adminGroup.PUT("/quizzes/:id", adminHandler.UpdateQuiz)
+			adminGroup.DELETE("/quizzes/:id", adminHandler.DeleteQuiz)
+			adminGroup.POST("/quizzes/:id/approve", adminHandler.ApproveQuiz)
+			adminGroup.POST("/quizzes/:id/publish", adminHandler.PublishQuiz)
+			adminGroup.POST("/quizzes/:id/unpublish", adminHandler.UnpublishQuiz)
+			adminGroup.POST("/quizzes/generate", adminHandler.GenerateQuiz)
 		}
 	}
 
-	// Server setup with Graceful Shutdown
-	server := &http.Server{
+	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%s", cfg.Port),
 		Handler:      r,
 		ReadTimeout:  15 * time.Second,
@@ -136,23 +131,22 @@ func main() {
 
 	go func() {
 		log.Printf("[SERVER] Quiz Keralam API listening on port %s", cfg.Port)
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("[FATAL] Server error: %v", err)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("[ERROR] Failed to start server: %v", err)
 		}
 	}()
 
-	// Wait for interrupt signal for graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	log.Println("[SERVER] Shutting down Quiz Keralam API gracefully...")
+	log.Println("[SERVER] Shutting down API server...")
 
-	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer shutdownCancel()
 
-	if err := server.Shutdown(shutdownCtx); err != nil {
-		log.Fatalf("[FATAL] Server forced to shutdown: %v", err)
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		log.Fatalf("[ERROR] Server forced to shutdown: %v", err)
 	}
 
-	log.Println("[SERVER] Server exited gracefully")
+	log.Println("[SERVER] Server exited cleanly")
 }
