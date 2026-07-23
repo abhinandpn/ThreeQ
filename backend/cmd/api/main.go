@@ -47,10 +47,10 @@ func main() {
 	} else {
 		quizRepo = quiz.NewMemoryRepository()
 	}
-	
+
 	quizSvc := quiz.NewService(quizRepo)
 	authSvc := auth.NewService(pool, cfg)
-	
+
 	// Seed default admin user asynchronously on startup if pool exists
 	if pool != nil {
 		go func() {
@@ -117,7 +117,14 @@ func main() {
 			adminGroup.POST("/quizzes/:id/approve", adminHandler.ApproveQuiz)
 			adminGroup.POST("/quizzes/:id/publish", adminHandler.PublishQuiz)
 			adminGroup.POST("/quizzes/:id/unpublish", adminHandler.UnpublishQuiz)
-			adminGroup.POST("/quizzes/generate", adminHandler.GenerateQuiz)
+		}
+
+		// Quiz generation can be triggered either by an authenticated admin or
+		// by the scheduled GitHub Actions workflow using its dedicated key.
+		generationGroup := v1.Group("/admin/quizzes")
+		generationGroup.Use(middleware.RequireCronKeyOrAdmin(cfg))
+		{
+			generationGroup.POST("/generate", adminHandler.GenerateQuiz)
 		}
 	}
 

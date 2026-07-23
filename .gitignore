@@ -1,0 +1,21 @@
+.DS_Store
+**/.DS_Store
+
+# Local environment files and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Local editor settings
+.vscode/
+
+# Build output and dependencies
+node_modules/
+.next/
+out/
+
+# Local logs
+*.log

@@ -36,9 +36,9 @@ func NewService(pool *pgxpool.Pool, cfg *config.Config, quizSvc quiz.Service) Se
 }
 
 type GeminiRequest struct {
-	Contents         []GeminiContent        `json:"contents"`
-	SystemInstruction *GeminiContent        `json:"system_instruction,omitempty"`
-	GenerationConfig *GeminiGenConfig       `json:"generationConfig,omitempty"`
+	Contents          []GeminiContent  `json:"contents"`
+	SystemInstruction *GeminiContent   `json:"system_instruction,omitempty"`
+	GenerationConfig  *GeminiGenConfig `json:"generationConfig,omitempty"`
 }
 
 type GeminiContent struct {
@@ -67,10 +67,10 @@ type AIGeneratedQuizPayload struct {
 	QuizDate  string `json:"quiz_date"`
 	Title     string `json:"title"`
 	Questions []struct {
-		DisplayOrder  int    `json:"display_order"`
-		Category      string `json:"category"`
-		QuestionText  string `json:"question_text"`
-		Options       struct {
+		DisplayOrder int    `json:"display_order"`
+		Category     string `json:"category"`
+		QuestionText string `json:"question_text"`
+		Options      struct {
 			A string `json:"A"`
 			B string `json:"B"`
 			C string `json:"C"`
@@ -178,8 +178,11 @@ Return JSON in this EXACT structure:
 		return nil, fmt.Errorf("failed saving AI generated draft quiz: %w", err)
 	}
 
-	// Update generated_by field to 'ai'
-	_, _ = s.pool.Exec(ctx, "UPDATE quizzes SET generated_by = 'ai' WHERE id = $1", createdQuiz.ID)
+	// The persistent repository stores generated_by in PostgreSQL. Memory mode
+	// has no database pool and already carries this value on the model.
+	if s.pool != nil {
+		_, _ = s.pool.Exec(ctx, "UPDATE quizzes SET generated_by = 'ai' WHERE id = $1", createdQuiz.ID)
+	}
 	createdQuiz.GeneratedBy = quiz.GeneratedByAI
 
 	s.logGenerationAttempt(ctx, targetDate, "success", "Quiz generated as draft successfully", rawResponse)
@@ -259,6 +262,11 @@ func (s *service) cleanJSONString(input string) string {
 }
 
 func (s *service) logGenerationAttempt(ctx context.Context, quizDate, status, message string, rawResponse interface{}) {
+	if s.pool == nil {
+		log.Printf("[AI-GENERATION] date=%s status=%s message=%s", quizDate, status, message)
+		return
+	}
+
 	var rawJSON []byte
 	if rawResponse != nil {
 		rawJSON, _ = json.Marshal(rawResponse)
